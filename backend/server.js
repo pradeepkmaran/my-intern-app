@@ -4,7 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import LoginRoute from "./Routes/LoginRoute.js";
 import StudentRoute from "./Routes/StudentRoute.js";
-import { loginDB, internDB } from "./db.js"; // Import the connections
+import { loginDB, usersDB } from "./db.js"; // Import the connections
 
 dotenv.config();
 
