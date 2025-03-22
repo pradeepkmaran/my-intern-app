@@ -2,8 +2,6 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
 import "./ViewInternshipDetails.css";
 
-const BACKEND_HOST = process.env.BACKEND_HOST;
-
 const ViewInternshipDetails = () => {
   const [internships, setInternships] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +12,7 @@ const ViewInternshipDetails = () => {
     const fetchInternships = async () => {
       try {
         const response = await fetch(
-          `${BACKEND_HOST}/api/user/student/my-internships/api/user/student/my-internships`,
+          "https://my-intern-app-backend.vercel.app/api/user/student/my-internships/api/user/student/my-internships",
           {
             method: "GET",
             headers: {

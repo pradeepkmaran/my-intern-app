@@ -3,8 +3,6 @@ import "./UploadInternshipDetails.css";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const BACKEND_HOST = process.env.BACKEND_HOST;
-
 const UploadInternshipDetails = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -55,7 +53,7 @@ const UploadInternshipDetails = () => {
   
     try {
       const response = await fetch(
-        `${BACKEND_HOST}/api/user/student/upload-internship-details`,
+        "https://my-intern-app-backend.vercel.app/api/user/student/upload-internship-details",
         {
           method: "POST",
           body: formDataToSend,
