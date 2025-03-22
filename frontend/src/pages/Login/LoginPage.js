@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import "./LoginPage.css";
 
+const BACKEND_HOST = process.env.BACKEND_HOST;
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +17,7 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      const response = await fetch("http://localhost:5000/api/user/login", {
+      const response = await fetch(`${BACKEND_HOST}/api/user/student/my-internships/api/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

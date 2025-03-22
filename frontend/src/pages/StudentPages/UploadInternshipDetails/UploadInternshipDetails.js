@@ -3,6 +3,8 @@ import "./UploadInternshipDetails.css";
 import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+const BACKEND_HOST = process.env.BACKEND_HOST;
+
 const UploadInternshipDetails = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -53,7 +55,7 @@ const UploadInternshipDetails = () => {
   
     try {
       const response = await fetch(
-        "http://localhost:5000/api/user/student/upload-internship-details",
+        `${BACKEND_HOST}/api/user/student/upload-internship-details`,
         {
           method: "POST",
           body: formDataToSend,
