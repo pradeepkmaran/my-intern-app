@@ -3,11 +3,15 @@ import path from "path";
 import fs from "fs";
 import { google } from "googleapis";
 import dotenv from "dotenv";
+import getStudentUserModel from "../Models/StudentUser.js";
+import { usersDB } from "../db.js";
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
 const FILE_TYPES = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg'];
 const UPLOADS_DIR = "/tmp/uploads/";
+const StudentUser = getStudentUserModel(usersDB);
 
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
@@ -64,47 +68,96 @@ async function uploadFile(authClient, filePath, fileName) {
   return `https://drive.google.com/file/d/${response.data.id}/view?usp=sharing`;
 }
 
-async function appendToSheet(authClient, internshipData) {
+async function appendToSheet(req, authClient, internshipData) {
   const sheets = google.sheets({ version: 'v4', auth: authClient });
+  const token = req.headers.authorization?.split(" ")[1];
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    internshipData.email = decoded.user.email; 
+  });
 
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.SHEET_ID,
     range: `${process.env.SHEET_NAME}!A:A`,
   });
+  const nextSerialNo = response.data.values.length;
 
-  const nextSerialNo = response.data.values ? response.data.values.length + 1 : 1;
+  const user = await StudentUser.findOne({ email: internshipData.email });
+  if (!user) {
+    throw new Error("User not found in the database.");
+  }
 
-  const values = [[
-    nextSerialNo,
-    "3122225001092",
-    "Pradeep KM",
-    "9841645816",
-    "CSE-B",
-    internshipData.role,
-    internshipData.period,
-    internshipData.startDate,
-    internshipData.endDate,
-    internshipData.companyName,
-    internshipData.placementType,
-    internshipData.stipend,
-    internshipData.researchIndustry,
-    internshipData.location,
-    internshipData.permissionLetter,
-    internshipData.completionCertificate,
-    internshipData.internshipReport,
-    internshipData.studentFeedback,
-    internshipData.employerFeedback,
-    internshipData.proofLinks.join(', ')
-  ]];
+  const studentDetails = {
+    registerNumber: user.register_number || "N/A",
+    studentName: user.name || "N/A",
+    mobileNumber: user.mobile_number || "N/A",
+    section: user.section || "N/A"
+  };
+
+  const internshipFields = [
+    "role", "period", "startDate", "endDate", "companyName",
+    "placementType", "stipend", "researchIndustry", "location",
+    "permissionLetter", "completionCertificate", "internshipReport",
+    "studentFeedback", "employerFeedback"
+  ];
+
+  const proofLinks = internshipData.proofLinks ? internshipData.proofLinks.join(', ') : "N/A";
+
+  const values = [
+    nextSerialNo, 
+    studentDetails.registerNumber,
+    studentDetails.studentName,
+    studentDetails.mobileNumber,
+    studentDetails.section,
+    ...internshipFields.map(field => internshipData[field] || "N/A"),
+    proofLinks
+  ];
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: process.env.SHEET_ID,
     range: `${process.env.SHEET_NAME}!A:K`,
     valueInputOption: 'USER_ENTERED',
-    resource: { values },
+    resource: { values: [values] },
   });
 
-  console.log(internshipData);
+  console.log("Internship data added to sheets");
+}
+
+async function updateOnDB(req, internshipData) {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    let email;
+    
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        throw new Error("Invalid or expired token.");
+      }
+      email = decoded.user.email;
+    });
+    
+    const user = await StudentUser.findOne({ email });
+
+    if (!user) {
+      throw new Error("User not found in the database.");
+    }
+
+    const existingInternshipIndex = user.internships.findIndex(
+      (internship) => internship.companyName === internshipData.companyName
+    );
+    
+    if (existingInternshipIndex !== -1) {
+      Object.assign(user.internships[existingInternshipIndex], internshipData);
+    } else {
+      user.internships.push(internshipData);
+    }
+    
+    await user.save();
+    
+    console.log("Internship data added to DB");
+    return { success: true, message: "Internship details updated." };
+  } catch (error) {
+    console.error("Error updating internship details:", error);
+    return { success: false, message: error.message };
+  }
 }
 
 const UploadInternshipDetailsController = async (req, res) => {
@@ -112,8 +165,7 @@ const UploadInternshipDetailsController = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "At least one file must be uploaded." });
     }
-    
-
+  
     const requiredFields = ["role", "period", "startDate", "endDate", "companyName", "placementType", "stipend", "researchIndustry", "location"];
     const allFields = ["role", "period", "startDate", "endDate", "companyName", "placementType", "stipend", "researchIndustry", "location", "permissionLetter", "completionCertificate", "internshipReport", "studentFeedback", "employerFeedback"];
     for (const field of requiredFields) {
@@ -137,7 +189,8 @@ const UploadInternshipDetailsController = async (req, res) => {
       proofLinks
     };
 
-    await appendToSheet(authClient, internshipDetails);
+    await appendToSheet(req, authClient, internshipDetails);
+    await updateOnDB(req, internshipDetails);
 
     res.status(200).json({
       message: "Internship details uploaded successfully!",

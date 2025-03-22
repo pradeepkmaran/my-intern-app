@@ -24,8 +24,8 @@ const LoginController = async (req, res) => {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    const payload = { user: { id: user._id, email: user.email, role: user.user_type } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5m" });
+    const payload = { user: { _id: user._id, email: user.email, user_type: user.user_type } };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     res.status(200).json({ token, user_type: user.user_type });
   } catch (err) {

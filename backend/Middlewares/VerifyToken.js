@@ -1,6 +1,9 @@
+import jwt from 'jsonwebtoken';
+
 const verifyRole = (allowedRoles) => {
   return (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
+
     if (!token) {
       return res.status(401).json({ message: "Unauthorized: No token provided" });
     }
@@ -9,8 +12,7 @@ const verifyRole = (allowedRoles) => {
       if (err) {
         return res.status(403).json({ message: "Forbidden: Invalid token" });
       }
-
-      if (!allowedRoles.includes(decoded.user_type)) {
+      if (!allowedRoles.includes(decoded.user.user_type)) {
         return res.status(403).json({ message: "Forbidden: Access denied" });
       }
 
