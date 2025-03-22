@@ -31,8 +31,8 @@ usersDB.once("open", () => {
 });
 
 app.use("/api/user/login", LoginRoute);
-app.use("/api/user/student", verifyToken, StudentRoute);
-// app.use("/api/user/admin", AdminRoute);
-// app.use("/api/user/faculty", FacultyRoute);
+app.use("/api/user/student", verifyToken(['student']), StudentRoute);
+// app.use("/api/user/faculty", verifyToken(['faculty']), FacultyRoute);
+// app.use("/api/user/admin", verifyToken(['admin']), AdminRoute);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
