@@ -12,7 +12,7 @@ const ViewInternshipDetails = () => {
     const fetchInternships = async () => {
       try {
         const response = await fetch(
-          "https://my-intern-app-backend.vercel.app/api/user/student/my-internships/api/user/student/my-internships",
+          "https://my-intern-app-backend.vercel.app/api/user/student/my-internships",
           {
             method: "GET",
             headers: {
