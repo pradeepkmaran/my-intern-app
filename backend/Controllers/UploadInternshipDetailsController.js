@@ -3,9 +3,9 @@ import path from "path";
 import fs from "fs";
 import { google } from "googleapis";
 import dotenv from "dotenv";
-import getStudentUserModel from "../Models/StudentUser.js";
-import { usersDB } from "../db.js";
 import jwt from 'jsonwebtoken';
+import { usersDB } from "../db.js";
+import getStudentUserModel from "../Models/StudentUser.js";
 
 dotenv.config();
 

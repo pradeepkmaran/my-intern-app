@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
-import getLoginUserModel from "../models/LoginUser.js";
+import getLoginUserModel from "../Models/LoginUser.js";
 import { loginDB } from "../db.js"; 
 
 const LoginController = async (req, res) => {
