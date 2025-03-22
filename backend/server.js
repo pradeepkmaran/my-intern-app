@@ -30,6 +30,7 @@ usersDB.once("open", () => {
   });
 });
 
+app.get("/", (req, res) => res.send("<h1>Hi</h1>"));
 app.use("/api/user/login", LoginRoute);
 app.use("/api/user/student", verifyToken(['student']), StudentRoute);
 // app.use("/api/user/faculty", verifyToken(['faculty']), FacultyRoute);
