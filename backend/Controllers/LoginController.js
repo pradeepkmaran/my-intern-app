@@ -1,9 +1,8 @@
-// Controllers/LoginController.js
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import getLoginUserModel from "../models/LoginUser.js";
-import { loginDB } from "../db.js";  // Import from db.js
+import { loginDB } from "../db.js"; 
 
 const LoginController = async (req, res) => {
   const errors = validationResult(req);
@@ -25,8 +24,8 @@ const LoginController = async (req, res) => {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    const payload = { user: { id: user.email, role: user.user_type } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const payload = { user: { id: user._id, email: user.email, role: user.user_type } };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "5m" });
 
     res.status(200).json({ token, user_type: user.user_type });
   } catch (err) {

@@ -1,10 +1,10 @@
-// server.js
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import LoginRoute from "./Routes/LoginRoute.js";
 import StudentRoute from "./Routes/StudentRoute.js";
-import { loginDB, usersDB } from "./db.js"; // Import the connections
+import verifyToken from "./Middlewares/VerifyToken.js";
+import { loginDB, usersDB } from "./db.js";
 
 dotenv.config();
 
@@ -15,18 +15,23 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 loginDB.once("open", () => {
+  console.log("Connected to 'login' database");
   loginDB.db.listCollections().toArray((err, collections) => {
-    if (err) {
-      console.error("Error listing collections in login DB:", err);
-    } else {
-      console.log("Collections in login DB:");
-      collections.forEach((col) => console.log(col.name));
-    }
+    if (err) console.error("Error listing collections:", err);
+    else collections.forEach((col) => console.log("Collection:", col.name));
+  });
+});
+
+usersDB.once("open", () => {
+  console.log("Connected to 'users' database");
+  usersDB.db.listCollections().toArray((err, collections) => {
+    if (err) console.error("Error listing collections:", err);
+    else collections.forEach((col) => console.log("Collection:", col.name));
   });
 });
 
 app.use("/api/user/login", LoginRoute);
-app.use("/api/user/student", StudentRoute);
+app.use("/api/user/student", verifyToken, StudentRoute);
 // app.use("/api/user/admin", AdminRoute);
 // app.use("/api/user/faculty", FacultyRoute);
 
