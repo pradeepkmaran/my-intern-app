@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./UploadInternshipDetails.css";
+import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const UploadInternshipDetails = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     role: "",
     period: "",
@@ -55,11 +57,15 @@ const UploadInternshipDetails = () => {
         {
           method: "POST",
           body: formDataToSend,
+          headers: {
+            "Authorization": `Bearer ${user?.token}`, 
+          },
         }
       );
   
       const data = await response.json();
       if (response.ok) {
+        navigate('/student/view-internship-details');
         setUploadStatus("Internship details uploaded successfully!");
       } else {
         setUploadStatus(data.error || "Upload failed. Try again.");
@@ -69,7 +75,6 @@ const UploadInternshipDetails = () => {
       setUploadStatus("Error uploading details.");
     }
 
-    navigate('/student/view-internship-details');
   };
 
   return (

@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext"; // adjust the import path
+import { AuthContext } from "../../context/AuthContext";
 import "./LoginPage.css";
 
 export default function LoginPage() {
@@ -8,7 +8,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); // use login method from context
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ export default function LoginPage() {
       const data = await response.json();
       
       if (response.ok) {
-        login({ token: data.token, user_type: data.user_type, email });
+        login({ token: data.token, email, user_type: data.user_type });
         if (data.user_type === "admin") {
           navigate("/admin/home");
         } else if(data.user_type === "faculty") {

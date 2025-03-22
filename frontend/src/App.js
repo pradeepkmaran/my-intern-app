@@ -39,7 +39,8 @@ function App() {
             <Route path="/faculty/verify-internship-details" element={<VerifyInternshipDetailsPage />} />
           </Route>
           
-          <Route path="/unauthorized" element={<h1>Unauthorized Access</h1>} />
+          <Route path="/unauthorized" element={<h1>Whoops! You are not authorized :\</h1>} />
+          <Route path="*" element={<h1>404! Page not found :\</h1>} />
         </Routes>
       </div>
     </Router>
