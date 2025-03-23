@@ -8,7 +8,7 @@ const MyInternshipsController = async (req, res) => {
     const token = req.cookies.access_token;
 
     if (!token) {
-      return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
+      return res.status(401).json({ success: false, message: "Unauthorized: No token provided 3" });
     }
 
     let email;

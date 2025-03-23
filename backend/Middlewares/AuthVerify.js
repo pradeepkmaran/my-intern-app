@@ -8,7 +8,7 @@ const authVerify = (req, res, next) => {
   
   const token = req.cookies.access_token;
   if (!token) {
-    return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
+    return res.status(401).json({ success: false, message: "Unauthorized: No token provided 1" });
   }
   
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {

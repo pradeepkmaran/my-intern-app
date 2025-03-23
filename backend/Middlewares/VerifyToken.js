@@ -4,7 +4,7 @@ const verifyRole = (allowedRoles) => {
   return (req, res, next) => {
     const token = req.cookies.access_token;
     if (!token) {
-      return res.status(401).json({ message: "Unauthorized: No token provided" });
+      return res.status(401).json({ message: "Unauthorized: No token provided 2" });
     }
     
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
