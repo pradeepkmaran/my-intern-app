@@ -30,6 +30,7 @@ const EditInternshipDetails = () => {
           {
             method: "GET",
             credentials: "include",
+            withCredentials: true,
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${user.token}`,

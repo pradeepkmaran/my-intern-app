@@ -18,6 +18,7 @@ const ViewInternshipDetails = () => {
           {
             method: "GET",
             credentials: "include",
+            withCredentials: true,
             headers: {
               "Content-Type": "application/json",
             },

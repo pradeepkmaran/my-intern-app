@@ -58,6 +58,7 @@ const UploadInternshipDetails = () => {
         {
           method: "POST",
           credentials: "include",
+          withCredentials: true,
           body: formDataToSend,
         }
       );
