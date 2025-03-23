@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
 export const AuthContext = createContext(null);
 
@@ -21,7 +22,14 @@ export const AuthProvider = ({ children }) => {
       const userType = getCookie('user_type');
   
       if (name && token && email && userType) {
-        setUser({ access_token: token, name, email, user_type: userType });
+        const decodedPayload = jwtDecode(token)
+        console.log(token);
+        console.log(decodedPayload);
+        if(userType !== decodedPayload.user.user_type) {
+          setUser(null);
+        } else {
+          setUser({ access_token: token, name, email, user_type: userType });
+        }
         setLoading(false);
         return;
       }
@@ -50,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     };
   
     checkUserSession();
-  }, [user?.access_token]);
+  }, [user?.access_token, user?.user_type]);
 
   const login = (userData) => {
     if (userData?.access_token) {
