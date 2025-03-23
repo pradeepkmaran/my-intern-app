@@ -28,7 +28,7 @@ export default function LoginPage() {
       const data = await response.json();
       
       if (response.ok) {
-        login({access_token: data.access_token, email, user_type: data.user_type });
+        login(data);
         if (data.user_type === "admin") {
           navigate("/admin/home");
         } else if(data.user_type === "faculty") {

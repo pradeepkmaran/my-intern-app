@@ -35,7 +35,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter, limits: { fileSize: 20 * 1024 * 1024 } });
+const upload = multer({ storage, fileFilter, limits: { fileSize: 100 * 1024 * 1024 } });
 
 async function authorize() {
   const CLIENT_API_KEY = JSON.parse(Buffer.from(process.env.CLIENT_API_KEY_JSON, 'base64').toString('utf-8'));
@@ -70,7 +70,11 @@ async function uploadFile(authClient, filePath, fileName) {
 
 async function appendToSheet(req, authClient, internshipData) {
   const sheets = google.sheets({ version: 'v4', auth: authClient });
-  const token = req.cookies.access_token;
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
+  }
+  const token = authHeader.split(' ')[1];
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     internshipData.email = decoded.user.email; 
   });
@@ -124,9 +128,14 @@ async function appendToSheet(req, authClient, internshipData) {
 
 async function updateOnDB(req, internshipData) {
   try {
-    const token = req.cookies.access_token;
-    let email;
-    
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
+    }
+
+    const token = authHeader.split(' ')[1];
+    let email = null;
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
         throw new Error("Invalid or expired token.");

@@ -18,7 +18,7 @@ const StudentHome = () => {
   return (
     <div className="student-home-container">
       <h1>Student Home</h1>
-      <h2>Welcome, {user ? user.email : "Guest"}!</h2>
+      <h2>Welcome, {user ? user.name : "Guest"}!</h2>
       <div className="button-container">
         <button onClick={handleUploadClick}>
           Upload Internship Details

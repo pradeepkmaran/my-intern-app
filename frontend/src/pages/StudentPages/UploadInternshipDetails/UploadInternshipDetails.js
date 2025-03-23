@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Upload } from 'lucide-react';
 import "./UploadInternshipDetails.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
 
 const UploadInternshipDetails = () => {
   const [formData, setFormData] = useState({
@@ -24,6 +25,7 @@ const UploadInternshipDetails = () => {
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -57,7 +59,9 @@ const UploadInternshipDetails = () => {
         `${process.env.REACT_APP_BACKEND_URL}/api/user/student/upload-internship-details`,
         {
           method: "POST",
-          credentials: "include",
+          headers: {
+            "Authorization": `Bearer ${user?.access_token}`
+          },
           body: formDataToSend,
         }
       );

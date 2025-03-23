@@ -16,11 +16,12 @@ export const AuthProvider = ({ children }) => {
   
     const checkUserSession = async () => {
       const token = getCookie('access_token');
+      const name = getCookie('name');
       const email = getCookie('email');
       const userType = getCookie('user_type');
   
-      if (token && email && userType) {
-        setUser({ access_token: token, email, user_type: userType });
+      if (name && token && email && userType) {
+        setUser({ access_token: token, name, email, user_type: userType });
         setLoading(false);
         return;
       }
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }) => {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Credentials": true
+            "Authorization": `Bearer ${user.access_token}`,
           },
         });
         const data = await response.json();
@@ -55,17 +56,18 @@ export const AuthProvider = ({ children }) => {
     if (userData?.access_token) {
       const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString();
       document.cookie = `access_token=${userData.access_token}; path=/; expires=${expires}; Secure; SameSite=None;`;
+      document.cookie = `name=${userData.name}; path=/; expires=${expires}; Secure; SameSite=None;`;
       document.cookie = `email=${userData.email}; path=/; expires=${expires}; Secure; SameSite=None;`;
       document.cookie = `user_type=${userData.user_type}; path=/; expires=${expires}; Secure; SameSite=None;`;
       
-      setUser({access_token: userData.access_token, email: userData.email, user_type: userData.user_type});
+      setUser(userData);
     }
   };
 
   const logout = () => {
-    document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-    document.cookie = "email=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-    document.cookie = "user_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    // document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    // document.cookie = "email=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    // document.cookie = "user_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
     setUser(null);
   };
 

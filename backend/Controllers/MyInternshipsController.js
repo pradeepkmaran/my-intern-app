@@ -1,14 +1,21 @@
 import jwt from "jsonwebtoken";
-import getStudentUserModel from "../Models/StudentUser.js"; 
+import getStudentUserModel from "../Models/StudentUser.js";
 import { usersDB } from '../db.js';
 
 const StudentUser = getStudentUserModel(usersDB);
+
 const MyInternshipsController = async (req, res) => {
   try {
-    const token = req.cookies.access_token;
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
+    }
+
+    const token = authHeader.split(' ')[1];
 
     if (!token) {
-      return res.status(401).json({ success: false, message: "Unauthorized: No token provided 3" });
+      return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
     }
 
     let email;

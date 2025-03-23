@@ -1,16 +1,17 @@
 import jwt from "jsonwebtoken";
 
 const authVerify = (req, res, next) => {
-  console.log(req.cookies);
-  if (!req.cookies) {
-    return res.status(400).json({ success: false, message: "Cookies are not enabled" });
+  const authHeader = req.headers['authorization'];
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
   }
-  
-  const token = req.cookies.access_token;
+  const token = authHeader.split(' ')[1];
+
   if (!token) {
-    return res.status(401).json({ success: false, message: "Unauthorized: No token provided 1" });
+    return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
   }
-  
+
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       return res.status(403).json({ success: false, message: "Forbidden: Invalid token" });

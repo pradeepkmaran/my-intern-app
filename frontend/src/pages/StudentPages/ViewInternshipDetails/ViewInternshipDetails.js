@@ -17,7 +17,9 @@ const ViewInternshipDetails = () => {
           `${process.env.REACT_APP_BACKEND_URL}/api/user/student/my-internships`,
           {
             method: "GET",
-            credentials: "include"
+            headers: {
+              "Authorization": `Bearer ${user?.access_token}`,
+            }
           }
         );
         const data = await response.json();

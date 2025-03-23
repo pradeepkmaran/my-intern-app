@@ -31,7 +31,7 @@ function App() {
             <Route path="/student/upload-internship-details" element={<UploadInternshipDetailsPage />} />
             <Route path="/student/edit-internship-details" element={<EditInternshipDetailsPage />} />
             <Route path="/student/view-internship-details" element={<StudentViewInternshipDetailsPage />} />
-            <Route path="/student/view-internship-details/edit/*" element={<EditInternshipDetailsPage />} />
+            <Route path="/student/view-internship-details/edit/:id" element={<EditInternshipDetailsPage />} />
           </Route>
 
           <Route element={<ProtectedRoute user={user} allowedRoles={["faculty"]} />}>

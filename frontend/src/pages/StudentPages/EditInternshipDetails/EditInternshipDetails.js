@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
-import "./EditInternshipDetails.css"; // Create a CSS file for styling
+import "./EditInternshipDetails.css"; 
 
 const EditInternshipDetails = () => {
-  const { id } = useParams(); // Get the internship ID from the URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [internship, setInternship] = useState({
@@ -29,7 +29,9 @@ const EditInternshipDetails = () => {
           `${process.env.REACT_APP_BACKEND_URL}/api/user/student/my-internships/${id}`,
           {
             method: "GET",
-            credentials: "include",
+            headers: {
+              "Authorization": `Bearer ${user?.access_token}`,
+            }
           }
         );
         const data = await response.json();
@@ -46,7 +48,7 @@ const EditInternshipDetails = () => {
     };
 
     fetchInternship();
-  }, [id, user?.token]);
+  }, [id, user?.access_token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,20 +62,19 @@ const EditInternshipDetails = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `https://my-intern-app-backend.vercel.app/api/user/student/my-internships/${id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/student/my-internships/update/${id}`,
         {
           method: "PUT",
-          credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${user?.access_token}`,
           },
           body: JSON.stringify(internship),
         }
       );
       const data = await response.json();
       if (data.success) {
-        alert("Internship updated successfully!");
-        navigate("/view-internships"); // Redirect to the internships list
+        navigate("/student/view-internship-details"); 
       } else {
         console.error("Failed to update internship:", data.message);
       }
