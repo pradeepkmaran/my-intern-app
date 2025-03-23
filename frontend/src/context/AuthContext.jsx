@@ -23,9 +23,7 @@ export const AuthProvider = ({ children }) => {
   
       if (name && token && email && userType) {
         const decodedPayload = jwtDecode(token)
-        console.log(token);
-        console.log(decodedPayload);
-        if(userType !== decodedPayload.user.user_type) {
+        if(userType !== decodedPayload.user?.user_type || email !== codedPayload.user?.email) {
           setUser(null);
         } else {
           setUser({ access_token: token, name, email, user_type: userType });
@@ -61,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   }, [user?.access_token, user?.user_type]);
 
   const login = (userData) => {
-    if (userData?.access_token) {
+    if (userData.access_token) {
       const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString();
       document.cookie = `access_token=${userData.access_token}; path=/; expires=${expires}; Secure; SameSite=None;`;
       document.cookie = `name=${userData.name}; path=/; expires=${expires}; Secure; SameSite=None;`;
