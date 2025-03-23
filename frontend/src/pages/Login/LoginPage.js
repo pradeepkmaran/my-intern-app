@@ -15,12 +15,13 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      const response = await fetch("https://my-intern-app-backend.vercel.app/api/user/login", {
+      console.log({email, password});
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({ email, password })
       });
 

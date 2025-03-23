@@ -26,15 +26,10 @@ const EditInternshipDetails = () => {
     const fetchInternship = async () => {
       try {
         const response = await fetch(
-          `https://my-intern-app-backend.vercel.app/api/user/student/my-internships/${id}`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/user/student/my-internships/${id}`,
           {
             method: "GET",
             credentials: "include",
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${user.token}`,
-            },
           }
         );
         const data = await response.json();
@@ -71,7 +66,6 @@ const EditInternshipDetails = () => {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
           },
           body: JSON.stringify(internship),
         }

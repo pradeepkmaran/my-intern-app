@@ -54,11 +54,10 @@ const UploadInternshipDetails = () => {
   
     try {
       const response = await fetch(
-        "https://my-intern-app-backend.vercel.app/api/user/student/upload-internship-details",
+        `${process.env.REACT_APP_BACKEND_URL}/api/user/student/upload-internship-details`,
         {
           method: "POST",
           credentials: "include",
-          withCredentials: true,
           body: formDataToSend,
         }
       );

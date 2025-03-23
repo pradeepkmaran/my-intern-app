@@ -15,9 +15,8 @@ dotenv.config();
 const app = express();
 app.use(cookieParser());
 app.use(cors({
-  origin: "https://my-intern-app.vercel.app",
+  origin: true,
   credentials: true,
-  withCredentials: true
 }));
 app.use(express.json());
 

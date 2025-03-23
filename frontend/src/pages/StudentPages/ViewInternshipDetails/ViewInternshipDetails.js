@@ -14,14 +14,10 @@ const ViewInternshipDetails = () => {
     const fetchInternships = async () => {
       try {
         const response = await fetch(
-          "https://my-intern-app-backend.vercel.app/api/user/student/my-internships",
+          `${process.env.REACT_APP_BACKEND_URL}/api/user/student/my-internships`,
           {
             method: "GET",
-            credentials: "include",
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
+            credentials: "include"
           }
         );
         const data = await response.json();

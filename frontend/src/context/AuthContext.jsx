@@ -20,13 +20,13 @@ export const AuthProvider = ({ children }) => {
       const userType = getCookie('user_type');
   
       if (token && email && userType) {
-        setUser({ email, user_type: userType });
+        setUser({ access_token: token, email, user_type: userType });
         setLoading(false);
         return;
       }
   
       try {
-        const response = await fetch("https://my-intern-app-backend.vercel.app/api/user/me", {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/me`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
         });
         const data = await response.json();
         if (response.ok && data.success) {
-          setUser(data.user);
+          setUser(data);
         } else {
           console.log("Authentication failed, but keeping cookies intact");
         }
@@ -54,11 +54,11 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     if (userData?.access_token) {
       const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString();
-      document.cookie = `access_token=${userData.access_token}; path=/; expires=${expires};`;
-      document.cookie = `email=${userData.email}; path=/; expires=${expires};`;
-      document.cookie = `user_type=${userData.user_type}; path=/; expires=${expires};`;
+      document.cookie = `access_token=${userData.access_token}; path=/; expires=${expires}; Secure; SameSite=None;`;
+      document.cookie = `email=${userData.email}; path=/; expires=${expires}; Secure; SameSite=None;`;
+      document.cookie = `user_type=${userData.user_type}; path=/; expires=${expires}; Secure; SameSite=None;`;
       
-      setUser({email: userData.email, user_type: userData.user_type});
+      setUser({access_token: userData.access_token, email: userData.email, user_type: userData.user_type});
     }
   };
 
