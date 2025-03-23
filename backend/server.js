@@ -13,11 +13,11 @@ import { loginDB, usersDB } from "./db.js";
 dotenv.config();
 
 const app = express();
-app.use(cookieParser());
 app.use(cors({
   origin: true,
   credentials: true,
 }));
+app.use(cookieParser());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;

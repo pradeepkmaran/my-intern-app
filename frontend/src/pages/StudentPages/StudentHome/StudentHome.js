@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
-import "./StudentHome.css"; // Import the CSS file
+import "./StudentHome.css"; 
 
 const StudentHome = () => {
   const { user, logout } = useContext(AuthContext);
