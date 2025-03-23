@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${user.access_token}`,
+            "Authorization": `Bearer ${user?.access_token}`,
           },
         });
         const data = await response.json();
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     };
   
     checkUserSession();
-  }, [user.access_token]);
+  }, [user?.access_token]);
 
   const login = (userData) => {
     if (userData?.access_token) {
