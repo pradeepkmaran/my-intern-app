@@ -54,7 +54,7 @@ const UploadInternshipDetails = () => {
   
     try {
       const response = await fetch(
-        "http://localhost:5000/api/user/student/upload-internship-details",
+        "https://my-intern-app-backend.vercel.app/api/user/student/upload-internship-details",
         {
           method: "POST",
           credentials: "include",

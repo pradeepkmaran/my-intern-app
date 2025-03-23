@@ -14,7 +14,7 @@ const ViewInternshipDetails = () => {
     const fetchInternships = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/user/student/my-internships",
+          "https://my-intern-app-backend.vercel.app/api/user/student/my-internships",
           {
             method: "GET",
             credentials: "include",

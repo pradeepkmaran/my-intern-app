@@ -70,7 +70,7 @@ async function uploadFile(authClient, filePath, fileName) {
 
 async function appendToSheet(req, authClient, internshipData) {
   const sheets = google.sheets({ version: 'v4', auth: authClient });
-  const token = req.headers.authorization?.split(" ")[1];
+  const token = req.cookies.access_token;
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     internshipData.email = decoded.user.email; 
   });
@@ -124,7 +124,7 @@ async function appendToSheet(req, authClient, internshipData) {
 
 async function updateOnDB(req, internshipData) {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = req.cookies.access_token;
     let email;
     
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {

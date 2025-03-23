@@ -26,7 +26,7 @@ const EditInternshipDetails = () => {
     const fetchInternship = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/user/student/my-internships/${id}`,
+          `https://my-intern-app-backend.vercel.app/api/user/student/my-internships/${id}`,
           {
             method: "GET",
             credentials: "include",
@@ -64,7 +64,7 @@ const EditInternshipDetails = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:5000/api/user/student/my-internships/${id}`,
+        `https://my-intern-app-backend.vercel.app/api/user/student/my-internships/${id}`,
         {
           method: "PUT",
           credentials: "include",
