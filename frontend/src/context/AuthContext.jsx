@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
   
       if (name && token && email && userType) {
         const decodedPayload = jwtDecode(token)
-        if(userType !== decodedPayload.user?.user_type || email !== codedPayload.user?.email) {
+        if(userType !== decodedPayload.user?.user_type || email !== decodedPayload.user?.email) {
           setUser(null);
         } else {
           setUser({ access_token: token, name, email, user_type: userType });
