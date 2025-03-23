@@ -5,7 +5,7 @@ import { usersDB } from '../db.js';
 const StudentUser = getStudentUserModel(usersDB);
 const MyInternshipsController = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = req.cookies.access_token;
 
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });

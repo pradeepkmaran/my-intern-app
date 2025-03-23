@@ -12,11 +12,11 @@ const ViewInternshipDetails = () => {
     const fetchInternships = async () => {
       try {
         const response = await fetch(
-          "https://my-intern-app-backend.vercel.app/api/user/student/my-internships",
+          "http://localhost:5000/api/user/student/my-internships",
           {
             method: "GET",
+            credentials: "include",
             headers: {
-              Authorization: `Bearer ${user?.token}`,
               "Content-Type": "application/json",
             },
           }
@@ -83,14 +83,16 @@ const ViewInternshipDetails = () => {
               className="internship-card"
               onClick={() => handleCardClick(internship)}
             >
-              <div className="card-badge">
-                {internship.researchIndustry || "Internship"}
-              </div>
               <div className="card-content">
                 <h2 className="role-title">{internship.role || "Role Not Specified"}</h2>
                 <h3 className="company-name">{internship.companyName || "Company Not Specified"}</h3>
                 
                 <div className="card-metadata">
+
+                  <div className="metadata-item">
+                    <span className="metadata-icon">🏢</span>
+                    <span>{internship.researchIndustry || "Internship"}</span>
+                  </div>
                   <div className="metadata-item">
                     <span className="metadata-icon">📍</span>
                     <span>{internship.location || "Location Not Specified"}</span>
@@ -117,7 +119,6 @@ const ViewInternshipDetails = () => {
         </div>
       )}
 
-      {/* Detailed View Modal */}
       {selectedInternship && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -166,7 +167,7 @@ const ViewInternshipDetails = () => {
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Internship Order</span>
-                    <span className="detail-value">{selectedInternship.internshipOrder || "N/A"}</span>
+                    <span className="detail-value"><a href={selectedInternship.proofLinks[0] || "N/A"}>View</a></span>
                   </div>
                 </div>
               </div>

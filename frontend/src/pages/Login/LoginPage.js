@@ -15,18 +15,19 @@ export default function LoginPage() {
     setLoading(true);
     
     try {
-      const response = await fetch("https://my-intern-app-backend.vercel.app/api/user/login", {
+      const response = await fetch("http://localhost:5000/api/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        credentials: "include",
+        body: JSON.stringify({ email, password })
       });
 
       const data = await response.json();
       
       if (response.ok) {
-        login({ token: data.token, email, user_type: data.user_type });
+        login({access_token: data.access_token, email, user_type: data.user_type });
         if (data.user_type === "admin") {
           navigate("/admin/home");
         } else if(data.user_type === "faculty") {

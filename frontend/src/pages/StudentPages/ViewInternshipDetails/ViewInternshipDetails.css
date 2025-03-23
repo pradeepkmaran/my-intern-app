@@ -5,11 +5,13 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  padding-top: 4rem; /* Add more padding to top */
   font-family: 'Poppins', sans-serif;
   color: #333;
 }
 
 .header-section {
+  margin-top: 2rem; /* Add top margin */
   margin-bottom: 2.5rem;
   text-align: center;
 }
@@ -71,13 +73,15 @@
 
 /* Cards Grid */
 .cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
 }
 
 /* Internship Card */
 .internship-card {
+  flex: 0 0 calc(33.333% - 1rem); /* Three cards per row with gap considered */
+  min-width: 300px; /* Minimum width */
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -88,23 +92,12 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  margin-bottom: 1rem;
 }
 
 .internship-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-}
-
-.card-badge {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background-color: #3b82f6;
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
 }
 
 .card-content {
@@ -120,6 +113,9 @@
   color: #1a202c;
   margin-bottom: 0.5rem;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .company-name {
@@ -351,5 +347,17 @@
   
   .modal-content {
     max-height: 85vh;
+  }
+}
+
+@media (max-width: 992px) {
+  .internship-card {
+    flex: 0 0 calc(50% - 0.75rem); /* Two cards per row */
+  }
+}
+
+@media (max-width: 640px) {
+  .internship-card {
+    flex: 0 0 100%; /* One card per row */
   }
 }

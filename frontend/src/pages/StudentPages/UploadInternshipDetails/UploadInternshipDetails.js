@@ -1,11 +1,9 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import "./UploadInternshipDetails.css";
-import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const UploadInternshipDetails = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     role: "",
     period: "",
@@ -53,13 +51,12 @@ const UploadInternshipDetails = () => {
   
     try {
       const response = await fetch(
-        "https://my-intern-app-backend.vercel.app/api/user/student/upload-internship-details",
+        "http://localhost:5000/api/user/student/upload-internship-details",
         {
           method: "POST",
+          credentials: "include", // through cookies
           body: formDataToSend,
-          headers: {
-            "Authorization": `Bearer ${user?.token}`, 
-          },
+          headers: {},
         }
       );
   

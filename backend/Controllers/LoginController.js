@@ -24,9 +24,9 @@ const LoginController = async (req, res) => {
     }
 
     const payload = { user: { _id: user._id, email: user.email, user_type: user.user_type } };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const access_token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    res.status(200).json({ token, user_type: user.user_type });
+    res.status(200).json({ access_token, email: user.email, user_type: user.user_type });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

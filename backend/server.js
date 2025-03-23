@@ -1,15 +1,24 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import LoginRoute from "./Routes/LoginRoute.js";
+import LogoutRoute from "./Routes/LogoutRoute.js";
 import StudentRoute from "./Routes/StudentRoute.js";
-import verifyToken from "./Middlewares/VerifyToken.js";
+import AuthVerifyRoute from "./Routes/AuthVerifyRoute.js";
+import authVerify from "./Middlewares/AuthVerify.js";
+import verifyRole from "./Middlewares/VerifyToken.js";
 import { loginDB, usersDB } from "./db.js";
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+  origin: true,
+  credentials: true,
+  withCredentials: true
+}));
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
@@ -32,8 +41,10 @@ usersDB.once("open", () => {
 
 app.get("/", (req, res) => res.send("<h1>Hi</h1>"));
 app.use("/api/user/login", LoginRoute);
-app.use("/api/user/student", verifyToken(['student']), StudentRoute);
-// app.use("/api/user/faculty", verifyToken(['faculty']), FacultyRoute);
-// app.use("/api/user/admin", verifyToken(['admin']), AdminRoute);
+app.use("/api/user/logout", authVerify, LogoutRoute);
+app.use("/api/user/me", AuthVerifyRoute);
+app.use("/api/user/student", authVerify, verifyRole(['student']), StudentRoute);
+// app.use("/api/user/faculty", verifyRole(['faculty']), FacultyRoute);
+// app.use("/api/user/admin", verifyRole(['admin']), AdminRoute);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
