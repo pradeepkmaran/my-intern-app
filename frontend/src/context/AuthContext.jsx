@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     };
   
     checkUserSession();
-  }, []);
+  }, [user.access_token]);
 
   const login = (userData) => {
     if (userData?.access_token) {

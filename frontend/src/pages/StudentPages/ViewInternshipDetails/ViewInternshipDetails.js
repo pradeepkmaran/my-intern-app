@@ -36,7 +36,7 @@ const ViewInternshipDetails = () => {
     };
 
     fetchInternships();
-  }, [user?.token]);
+  }, [user?.access_token]);
 
   const handleCardClick = (internship) => {
     setSelectedInternship(internship);
