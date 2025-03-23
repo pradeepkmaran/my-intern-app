@@ -2,7 +2,7 @@ import express from "express";
 import authVerify from "../Middlewares/AuthVerify.js";
 const AuthVerifyRoute = express.Router();
 
-AuthVerifyRoute.get("/", authVerify, (req, res) => {
+AuthVerifyRoute.get("/", (req, res) => {
     res.status(200).json({ success: true, user: req.user });
 });
 

@@ -12,11 +12,27 @@ import { loginDB, usersDB } from "./db.js";
 
 dotenv.config();
 
+const allowedOrigins = [
+  'https://my-intern-app.vercel.app',
+  'http://localhost:3000',
+];
+
 const app = express();
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,7 +58,7 @@ usersDB.once("open", () => {
 app.get("/", (req, res) => res.send("<h1>Hi</h1>"));
 app.use("/api/user/login", LoginRoute);
 app.use("/api/user/logout", authVerify, LogoutRoute);
-app.use("/api/user/me", AuthVerifyRoute);
+app.use("/api/user/me", authVerify, AuthVerifyRoute);
 app.use("/api/user/student", authVerify, verifyRole(['student']), StudentRoute);
 // app.use("/api/user/faculty", verifyRole(['faculty']), FacultyRoute);
 // app.use("/api/user/admin", verifyRole(['admin']), AdminRoute);
