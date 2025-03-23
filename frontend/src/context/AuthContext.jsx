@@ -49,7 +49,6 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Error fetching user:", error);
-        console.log("Error fetching user, but keeping cookies intact");
       } finally {
         setLoading(false);
       }
@@ -71,9 +70,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-    // document.cookie = "email=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-    // document.cookie = "user_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    document.cookie = "email=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+    document.cookie = "user_type=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
     setUser(null);
   };
 
