@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import "./ViewInternshipDetails.css";
 
@@ -7,6 +8,7 @@ const ViewInternshipDetails = () => {
   const [loading, setLoading] = useState(true);
   const [selectedInternship, setSelectedInternship] = useState(null);
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInternships = async () => {
@@ -41,13 +43,16 @@ const ViewInternshipDetails = () => {
     setSelectedInternship(internship);
   };
 
+  const handleEditClick = (internshipId) => {
+    navigate(`/student/view-internship-details/edit/${internshipId}`);
+  };
+
   const closeModal = (e) => {
     if (e.target.classList.contains('modal-overlay')) {
       setSelectedInternship(null);
     }
   };
 
-  // Format date function
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -99,7 +104,7 @@ const ViewInternshipDetails = () => {
                   </div>
                   <div className="metadata-item">
                     <span className="metadata-icon">📅</span>
-                    <span>{internship.period || "Period Not Specified"}</span>
+                    <span>{internship.period || "Period Not Specified"} weeks</span>
                   </div>
                   {internship.stipend && (
                     <div className="metadata-item">
@@ -129,6 +134,11 @@ const ViewInternshipDetails = () => {
             <div className="modal-header">
               <h2>{selectedInternship.role || "Role Not Specified"}</h2>
               <h3>{selectedInternship.companyName || "Company Not Specified"}</h3>
+              <button
+                className="edit-button"
+                onClick={() => handleEditClick(selectedInternship._id)}
+              > Edit
+              </button>
             </div>
             
             <div className="modal-body">
@@ -137,7 +147,7 @@ const ViewInternshipDetails = () => {
                 <div className="details-grid">
                   <div className="detail-item">
                     <span className="detail-label">Period</span>
-                    <span className="detail-value">{selectedInternship.period || "N/A"}</span>
+                    <span className="detail-value">{selectedInternship.period || "N/A"} weeks</span>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Start Date</span>

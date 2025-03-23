@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
+import "./StudentHome.css"; // Import the CSS file
 
 const StudentHome = () => {
   const { user, logout } = useContext(AuthContext);
@@ -9,29 +10,26 @@ const StudentHome = () => {
   const handleUploadClick = () => {
     navigate("/student/upload-internship-details");
   };
-  
+
   const handleViewClick = () => {
     navigate("/student/view-internship-details");
   };
 
-  const handleEditClick = () => {
-    navigate("/student/edit-internship-details");
-  };
-
   return (
-    <div>
+    <div className="student-home-container">
       <h1>Student Home</h1>
       <h2>Welcome, {user ? user.email : "Guest"}!</h2>
-      <button onClick={handleUploadClick}>
-        Upload Internship Details
-      </button> <br /> <br />
-      <button onClick={handleViewClick}>
-        View Internship Details
-      </button> <br /> <br />
-      <button onClick={handleEditClick}>
-        Edit Internship Details
-      </button> <br /> <br />
-      <button onClick={logout}>Logout</button>
+      <div className="button-container">
+        <button onClick={handleUploadClick}>
+          Upload Internship Details
+        </button>
+        <button onClick={handleViewClick}>
+          View Internship Details
+        </button>
+        <button className="logout" onClick={logout}>
+          Logout
+        </button>
+      </div>
     </div>
   );
 };
