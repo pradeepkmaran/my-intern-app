@@ -8,7 +8,7 @@ const StudentUser = getStudentUserModel(usersDB);
 
 const AllInternshipDetailsController = async (req, res) => {
   try {
-    const studentDetails = await StudentUser.findOne();
+    const studentDetails = await StudentUser.find().sort({register_number: 1});
     return res.status(200).json({ success: true, studentDetails });
   } catch (error) {
     console.error("Error fetching internship details:", error);
