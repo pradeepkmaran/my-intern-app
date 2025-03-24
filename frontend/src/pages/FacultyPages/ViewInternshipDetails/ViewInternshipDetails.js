@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/AuthContext";
 import "./ViewInternshipDetails.css";
 
 const ViewInternshipDetails = () => {
   const [studentsData, setStudentsData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedInternship, setSelectedInternship] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInternships = async () => {
@@ -39,6 +39,7 @@ const ViewInternshipDetails = () => {
             }))
           }));
           setStudentsData(enhancedData);
+          setFilteredData(enhancedData);
         } else {
           setError("Invalid data format");
         }
@@ -51,6 +52,33 @@ const ViewInternshipDetails = () => {
 
     fetchInternships();
   }, [user?.access_token]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredData(studentsData);
+      return;
+    }
+
+    const searchTermLower = searchTerm.toLowerCase();
+    
+    const filtered = studentsData.filter(student => {   
+      if (
+        student.name.toLowerCase().includes(searchTermLower) ||
+        student.register_number.toLowerCase().includes(searchTermLower)
+      ) {
+        return true;
+      }
+      
+      const hasMatchingInternship = student.internships.some(internship => 
+        (internship.companyName || "").toLowerCase().includes(searchTermLower) ||
+        (internship.role || "").toLowerCase().includes(searchTermLower)
+      );
+
+      return hasMatchingInternship;
+    });
+
+    setFilteredData(filtered);
+  }, [searchTerm, studentsData]);
 
   const handleViewDetails = (internship) => {
     setSelectedInternship(internship);
@@ -139,11 +167,44 @@ const ViewInternshipDetails = () => {
     });
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
+
   return (
     <div className="internship-container faculty-view">
       <div className="header-section">
         <h1>Student Internships</h1>
         <p className="subtitle">View and manage student internship records</p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="search-container">
+        <div className="search-input-wrapper">
+          <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search by name, register number, company, or role..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          {searchTerm && (
+            <button className="clear-search" onClick={clearSearch}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -156,18 +217,28 @@ const ViewInternshipDetails = () => {
           <div className="error-icon">⚠️</div>
           <p>{error}</p>
         </div>
-      ) : studentsData.length === 0 ? (
+      ) : filteredData.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">📋</div>
-          <p>No student internships found.</p>
+          {searchTerm ? (
+            <>
+              <div className="no-data-icon">🔍</div>
+              <p>No results found for "{searchTerm}".</p>
+              <button className="reset-search-button" onClick={clearSearch}>Clear Search</button>
+            </>
+          ) : (
+            <>
+              <div className="no-data-icon">📋</div>
+              <p>No student internships found.</p>
+            </>
+          )}
         </div>
       ) : (
         <div className="table-responsive">
           <table className="internship-table">
             <thead>
               <tr>
-                <th>Student Name</th>
                 <th>Register Number</th>
+                <th>Student Name</th>
                 <th>Company</th>
                 <th>Role</th>
                 <th>Period</th>
@@ -177,16 +248,16 @@ const ViewInternshipDetails = () => {
               </tr>
             </thead>
             <tbody>
-              {studentsData.map(student => (
+              {filteredData.map(student => (
                 student.internships.map((internship, index) => (
                   <tr key={`${student._id}-${internship._id}`}>
                     {index === 0 && (
                       <>
-                        <td rowSpan={student.internships.length} className="student-name">
-                          {student.name}
-                        </td>
                         <td rowSpan={student.internships.length} className="register-number">
                           {student.register_number}
+                        </td>
+                        <td rowSpan={student.internships.length} className="student-name">
+                          {student.name}
                         </td>
                       </>
                     )}
@@ -208,7 +279,7 @@ const ViewInternshipDetails = () => {
                     <td className="action-buttons">
                       <button 
                         className="view-button" 
-                        onClick={() => handleViewDetails({...internship, studentName: student.name})}
+                        onClick={() => handleViewDetails({...internship, studentName: student.name, studentId: student._id})}
                       >
                         View
                       </button>
