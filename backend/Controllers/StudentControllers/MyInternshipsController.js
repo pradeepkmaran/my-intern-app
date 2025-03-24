@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import getStudentUserModel from "../Models/StudentUser.js";
-import { usersDB } from '../db.js';
+import getStudentUserModel from "../../Models/StudentUser.js";
+import { usersDB } from '../../db.js';
 
 const StudentUser = getStudentUserModel(usersDB);
 

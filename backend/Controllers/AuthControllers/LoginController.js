@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
-import getLoginUserModel from "../Models/LoginUser.js";
-import getStudentUserModel from "../Models/StudentUser.js";
-import { loginDB, usersDB } from "../db.js"; 
+import getLoginUserModel from "../../Models/LoginUser.js";
+import getStudentUserModel from "../../Models/StudentUser.js";
+import { loginDB, usersDB } from "../../db.js"; 
 
 const LoginController = async (req, res) => {
   const errors = validationResult(req);

@@ -1,5 +1,4 @@
 import express from "express";
-import authVerify from "../Middlewares/AuthVerify.js";
 const AuthVerifyRoute = express.Router();
 
 AuthVerifyRoute.get("/", (req, res) => {

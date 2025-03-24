@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import LoginRoute from "./Routes/LoginRoute.js";
 import LogoutRoute from "./Routes/LogoutRoute.js";
 import StudentRoute from "./Routes/StudentRoute.js";
+import FacultyRoute from "./Routes/FacultyRoute.js";
 import AuthVerifyRoute from "./Routes/AuthVerifyRoute.js";
 import authVerify from "./Middlewares/AuthVerify.js";
 import verifyRole from "./Middlewares/VerifyToken.js";
@@ -60,7 +61,7 @@ app.use("/api/user/login", LoginRoute);
 app.use("/api/user/logout", authVerify, LogoutRoute);
 app.use("/api/user/me", authVerify, AuthVerifyRoute);
 app.use("/api/user/student", authVerify, verifyRole(['student']), StudentRoute);
-// app.use("/api/user/faculty", verifyRole(['faculty']), FacultyRoute);
+app.use("/api/user/faculty", authVerify, verifyRole(['faculty']), FacultyRoute);
 // app.use("/api/user/admin", verifyRole(['admin']), AdminRoute);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

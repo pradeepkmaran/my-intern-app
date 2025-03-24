@@ -1,7 +1,7 @@
 import express from "express";
 import { body } from "express-validator";
 import dotenv from "dotenv";
-import LoginController from '../Controllers/LoginController.js'
+import LoginController from '../Controllers/AuthControllers/LoginController.js'
 
 dotenv.config();
 const LoginRoute = express.Router();

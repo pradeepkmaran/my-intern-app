@@ -1,8 +1,8 @@
 import express from "express";
-import { upload, UploadInternshipDetailsController } from "../Controllers/UploadInternshipDetailsController.js";
-import MyInternshipsController from "../Controllers/MyInternshipsController.js"
-import StudentInternshipDetailsController from "../Controllers/StudentInternshipDetailsController.js"
-import StudentInternshipDetailsUpdateController from "../Controllers/StudentInternshipDetailsUpdateController.js"
+import { upload, UploadInternshipDetailsController } from "../Controllers/StudentControllers/UploadInternshipDetailsController.js";
+import MyInternshipsController from "../Controllers/StudentControllers/MyInternshipsController.js"
+import StudentInternshipDetailsController from "../Controllers/StudentControllers/StudentInternshipDetailsController.js"
+import StudentInternshipDetailsUpdateController from "../Controllers/StudentControllers/StudentInternshipDetailsUpdateController.js"
 
 const StudentRoute = express.Router();
 
