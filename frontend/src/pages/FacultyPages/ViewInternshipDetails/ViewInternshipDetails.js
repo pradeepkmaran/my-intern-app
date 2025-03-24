@@ -1,8 +1,374 @@
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
+import "./ViewInternshipDetails.css";
 
 const ViewInternshipDetails = () => {
-    return (
-        <h1> View Internship Details Page </h1>
+  const [studentsData, setStudentsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedInternship, setSelectedInternship] = useState(null);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchInternships = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/user/faculty/all-internships`,
+          {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${user?.access_token}`,
+            }
+          }
+        );
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch internship data");
+        }
+        
+        const data = await response.json();
+        if (data.success && Array.isArray(data.studentDetails)) {
+          // Adding a verification status field if it doesn't exist
+          const enhancedData = data.studentDetails.map(student => ({
+            ...student,
+            internships: student.internships.map(internship => ({
+              ...internship,
+              verificationStatus: internship.verificationStatus || "pending" // Use existing or default to pending
+            }))
+          }));
+          setStudentsData(enhancedData);
+        } else {
+          setError("Invalid data format");
+        }
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInternships();
+  }, [user?.access_token]);
+
+  const handleViewDetails = (internship) => {
+    setSelectedInternship(internship);
+  };
+
+  const closeModal = (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+      setSelectedInternship(null);
+    }
+  };
+
+  // Dummy handler function for verify button
+  const handleVerifyInternship = (internshipId, studentId) => {
+    console.log(`Verifying internship ${internshipId} for student ${studentId}`);
+    
+    // Update local state to reflect the change immediately
+    setStudentsData(prevData => 
+      prevData.map(student => {
+        if (student._id === studentId) {
+          return {
+            ...student,
+            internships: student.internships.map(internship => {
+              if (internship._id === internshipId) {
+                return { ...internship, verificationStatus: "verified" };
+              }
+              return internship;
+            })
+          };
+        }
+        return student;
+      })
     );
+    
+    // In a real implementation, you would make an API call here
+    // Example:
+    // fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/faculty/verify-internship/${internshipId}`, {
+    //   method: "PUT",
+    //   headers: {
+    //     "Authorization": `Bearer ${user?.access_token}`,
+    //     "Content-Type": "application/json"
+    //   },
+    //   body: JSON.stringify({ status: "verified" })
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //   if (data.success) {
+    //     // Handle success
+    //   } else {
+    //     // Handle error, revert UI change
+    //   }
+    // });
+  };
+
+  // Dummy handler function for unverify button
+  const handleUnverifyInternship = (internshipId, studentId) => {
+    console.log(`Unverifying internship ${internshipId} for student ${studentId}`);
+    
+    // Update local state to reflect the change immediately
+    setStudentsData(prevData => 
+      prevData.map(student => {
+        if (student._id === studentId) {
+          return {
+            ...student,
+            internships: student.internships.map(internship => {
+              if (internship._id === internshipId) {
+                return { ...internship, verificationStatus: "pending" };
+              }
+              return internship;
+            })
+          };
+        }
+        return student;
+      })
+    );
+    
+    // In a real implementation, you would make an API call here
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  return (
+    <div className="internship-container faculty-view">
+      <div className="header-section">
+        <h1>Student Internships</h1>
+        <p className="subtitle">View and manage student internship records</p>
+      </div>
+
+      {loading ? (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading internship data...</p>
+        </div>
+      ) : error ? (
+        <div className="error-container">
+          <div className="error-icon">⚠️</div>
+          <p>{error}</p>
+        </div>
+      ) : studentsData.length === 0 ? (
+        <div className="no-data-container">
+          <div className="no-data-icon">📋</div>
+          <p>No student internships found.</p>
+        </div>
+      ) : (
+        <div className="table-responsive">
+          <table className="internship-table">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Register Number</th>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Period</th>
+                <th>Status</th>
+                <th>Verification</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {studentsData.map(student => (
+                student.internships.map((internship, index) => (
+                  <tr key={`${student._id}-${internship._id}`}>
+                    {index === 0 && (
+                      <>
+                        <td rowSpan={student.internships.length} className="student-name">
+                          {student.name}
+                        </td>
+                        <td rowSpan={student.internships.length} className="register-number">
+                          {student.register_number}
+                        </td>
+                      </>
+                    )}
+                    <td>{internship.companyName || "N/A"}</td>
+                    <td>{internship.role || "N/A"}</td>
+                    <td>{internship.period || "N/A"} weeks</td>
+                    <td>
+                      <span className={`status-badge ${getCompletionStatus(internship)}`}>
+                        {getCompletionStatus(internship) === "complete" ? "Complete" : 
+                         getCompletionStatus(internship) === "partial" ? "Partial" : "Incomplete"}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`verification-badge ${internship.verificationStatus}`}>
+                        {internship.verificationStatus === "verified" ? "Verified" : 
+                         internship.verificationStatus === "rejected" ? "Rejected" : "Pending"}
+                      </span>
+                    </td>
+                    <td className="action-buttons">
+                      <button 
+                        className="view-button" 
+                        onClick={() => handleViewDetails({...internship, studentName: student.name})}
+                      >
+                        View
+                      </button>
+                      
+                      {internship.verificationStatus !== "verified" ? (
+                        <button 
+                          className="verify-button" 
+                          onClick={() => handleVerifyInternship(internship._id, student._id)}
+                        >
+                          Verify
+                        </button>
+                      ) : (
+                        <button 
+                          className="unverify-button" 
+                          onClick={() => handleUnverifyInternship(internship._id, student._id)}
+                        >
+                          Unverify
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {selectedInternship && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <button className="close-button" onClick={() => setSelectedInternship(null)}>
+              ×
+            </button>
+            
+            <div className="modal-header">
+              <h2>{selectedInternship.role || "Role Not Specified"}</h2>
+              <h3>{selectedInternship.companyName || "Company Not Specified"}</h3>
+              {selectedInternship.studentName && 
+                <p className="student-info">Student: {selectedInternship.studentName}</p>
+              }
+              
+              <div className="modal-actions">
+                {selectedInternship.verificationStatus !== "verified" ? (
+                  <button 
+                    className="verify-button" 
+                    onClick={() => {
+                      handleVerifyInternship(selectedInternship._id, selectedInternship.studentId);
+                      setSelectedInternship({...selectedInternship, verificationStatus: "verified"});
+                    }}
+                  >
+                    Verify Internship
+                  </button>
+                ) : (
+                  <button 
+                    className="unverify-button" 
+                    onClick={() => {
+                      handleUnverifyInternship(selectedInternship._id, selectedInternship.studentId);
+                      setSelectedInternship({...selectedInternship, verificationStatus: "pending"});
+                    }}
+                  >
+                    Unverify Internship
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            <div className="modal-body">
+              <div className="details-section">
+                <h4 className="section-title">Internship Information</h4>
+                <div className="details-grid">
+                  <div className="detail-item">
+                    <span className="detail-label">Period</span>
+                    <span className="detail-value">{selectedInternship.period || "N/A"} weeks</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Start Date</span>
+                    <span className="detail-value">{formatDate(selectedInternship.startDate)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">End Date</span>
+                    <span className="detail-value">{formatDate(selectedInternship.endDate)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Placement Type</span>
+                    <span className="detail-value">{selectedInternship.placementType || "N/A"}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Stipend</span>
+                    <span className="detail-value">
+                      {selectedInternship.stipend ? `₹${selectedInternship.stipend}` : "N/A"}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Type</span>
+                    <span className="detail-value">{selectedInternship.researchIndustry || "N/A"}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Location</span>
+                    <span className="detail-value">{selectedInternship.location || "N/A"}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="detail-label">Internship Order</span>
+                    <span className="detail-value">
+                      <a href={selectedInternship.proofLinks && selectedInternship.proofLinks[0] ? selectedInternship.proofLinks[0] : "#"} target="_blank" rel="noopener noreferrer">
+                        {selectedInternship.proofLinks && selectedInternship.proofLinks[0] ? "View" : "N/A"}
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="details-section">
+                <h4 className="section-title">Documentation Status</h4>
+                <div className="documentation-status">
+                  <div className={`status-item ${selectedInternship.permissionLetter === "true" ? "completed" : "pending"}`}>
+                    <span className="status-icon">{selectedInternship.permissionLetter === "true" ? "✓" : "○"}</span>
+                    <span className="status-label">Permission & Offer Letters</span>
+                  </div>
+                  <div className={`status-item ${selectedInternship.completionCertificate === "true" ? "completed" : "pending"}`}>
+                    <span className="status-icon">{selectedInternship.completionCertificate === "true" ? "✓" : "○"}</span>
+                    <span className="status-label">Completion Certificate</span>
+                  </div>
+                  <div className={`status-item ${selectedInternship.internshipReport === "true" ? "completed" : "pending"}`}>
+                    <span className="status-icon">{selectedInternship.internshipReport === "true" ? "✓" : "○"}</span>
+                    <span className="status-label">Internship Report</span>
+                  </div>
+                  <div className={`status-item ${selectedInternship.studentFeedback === "true" ? "completed" : "pending"}`}>
+                    <span className="status-icon">{selectedInternship.studentFeedback === "true" ? "✓" : "○"}</span>
+                    <span className="status-label">Student Feedback</span>
+                  </div>
+                  <div className={`status-item ${selectedInternship.employerFeedback === "true" ? "completed" : "pending"}`}>
+                    <span className="status-icon">{selectedInternship.employerFeedback === "true" ? "✓" : "○"}</span>
+                    <span className="status-label">Employer Feedback</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Helper function to determine completion status
+const getCompletionStatus = (internship) => {
+  const requiredDocs = [
+    internship.permissionLetter === "true",
+    internship.completionCertificate === "true", 
+    internship.internshipReport === "true",
+    internship.studentFeedback === "true",
+    internship.employerFeedback === "true"
+  ];
+  
+  const completedCount = requiredDocs.filter(Boolean).length;
+  
+  if (completedCount === requiredDocs.length) return "complete";
+  if (completedCount > 0) return "partial";
+  return "incomplete";
 };
 
 export default ViewInternshipDetails;

@@ -1,0 +1,257 @@
+/* Add these styles to your existing ViewInternshipDetails.css file */
+
+/* Faculty view specific styles */
+.faculty-view {
+    max-width: 1400px; /* Wider container for table */
+  }
+  
+  /* Table styles */
+  .table-responsive {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .internship-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+  }
+  
+  .internship-table th {
+    background-color: #f8fafc;
+    padding: 1rem 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #334155;
+    border-bottom: 2px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+  }
+  
+  .internship-table td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: #4b5563;
+    vertical-align: middle;
+  }
+  
+  .internship-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .internship-table tr:hover {
+    background-color: #f9fafb;
+  }
+  
+  .student-name {
+    font-weight: 600;
+    color: #334155;
+  }
+  
+  .register-number {
+    font-family: monospace;
+    color: #6b7280;
+  }
+  
+  /* Status badge styling */
+  .status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+    text-align: center;
+  }
+  
+  .status-badge.complete {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  
+  .status-badge.partial {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  .status-badge.incomplete {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  /* Verification badge styling */
+  .verification-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+    text-align: center;
+    min-width: 80px;
+  }
+  
+  .verification-badge.verified {
+    background-color: #bbf7d0;
+    color: #166534;
+  }
+  
+  .verification-badge.rejected {
+    background-color: #fecaca;
+    color: #b91c1c;
+  }
+  
+  .verification-badge.pending {
+    background-color: #e0f2fe;
+    color: #0369a1;
+  }
+  
+  /* Action buttons container */
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  /* View button */
+  .view-button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .view-button:hover {
+    background-color: #2563eb;
+  }
+  
+  /* Verify button */
+  .verify-button {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .verify-button:hover {
+    background-color: #059669;
+  }
+  
+  /* Unverify button */
+  .unverify-button {
+    background-color: #f59e0b;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .unverify-button:hover {
+    background-color: #d97706;
+  }
+  
+  /* Modal actions section */
+  .modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .modal-actions .verify-button,
+  .modal-actions .unverify-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+  }
+  
+  /* Student info in modal */
+  .student-info {
+    font-size: 1rem;
+    background-color: #f3f4f6;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    color: #4b5563;
+    margin-top: 0.5rem;
+    display: inline-block;
+  }
+  
+  /* Error container */
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    background-color: #fee2e2;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    color: #b91c1c;
+  }
+  
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Responsive tweaks for the faculty view */
+  @media (max-width: 1200px) {
+    .internship-table th, 
+    .internship-table td {
+      padding: 0.75rem 0.5rem;
+    }
+    
+    .view-button,
+    .verify-button,
+    .unverify-button {
+      padding: 0.4rem 0.8rem;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    
+    .verification-badge,
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .faculty-view {
+      padding: 1rem;
+    }
+    
+    .internship-table {
+      font-size: 0.9rem;
+    }
+    
+    .view-button,
+    .verify-button,
+    .unverify-button {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+    }
+  }
