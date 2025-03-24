@@ -235,20 +235,20 @@
 }
 
 .edit-button {
-  background-color: #3b82f6;
+  background-color: #4299e1;
   color: white;
-  width:auto;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   transition: background-color 0.3s ease;
-  position: relative;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
 }
 
 .edit-button:hover {
-  background-color: #2563eb;
+  background-color: #3182ce;
 }
 
 .modal-header h2 {
