@@ -1,11 +1,13 @@
 import os
 import sys
 import io
-from django.http import HttpResponse
+import json
+from django.http import JsonResponse
 from django.conf import settings
 from django.core.wsgi import get_wsgi_application
 from django.urls import path
 from django.core.management import execute_from_command_line
+from django.views.decorators.csrf import csrf_exempt
 
 # Import PDFMiner components
 from pdfminer.converter import TextConverter
@@ -52,36 +54,59 @@ def classify_document(text):
     
     for category, keywords in categories.items():
         if any(keyword.lower() in text.lower() for keyword in keywords):
-            return f"Document Type: {category}"
-    return "Document Type: Unknown"
+            return category
+    return "Unknown"
 
-# View function
+# View function with JSON response
+@csrf_exempt
 def upload_pdf(request):
     if request.method == "POST" and request.FILES.get("pdf"):
         pdf_file = request.FILES["pdf"]
         pdf_path = f"/tmp/{pdf_file.name}"
-        with open(pdf_path, "wb") as f:
-            for chunk in pdf_file.chunks():
-                f.write(chunk)
+        
+        response_data = {
+            "message": "",
+            "document_type": "",
+            "extracted_text": ""
+        }
         
         try:
+            # Save the uploaded file
+            with open(pdf_path, "wb") as f:
+                for chunk in pdf_file.chunks():
+                    f.write(chunk)
+            
+            # Extract and classify text
             extracted_text = extract_text_from_pdf(pdf_path)
             document_type = classify_document(extracted_text)
-            result = f"{document_type}\n\nExtracted Text Preview:\n{extracted_text}..."
-        except Exception as e:
-            result = f"Error processing PDF: {str(e)}"
-        
-        try:
-            os.remove(pdf_path)
-        except:
-            pass
             
-        return HttpResponse(result)
-    return HttpResponse("Upload a PDF via POST request.")
+            # Populate response
+            response_data["message"] = "PDF processed successfully"
+            response_data["document_type"] = document_type
+            response_data["extracted_text"] = extracted_text
+            
+        except Exception as e:
+            response_data["message"] = f"Error processing PDF: {str(e)}"
+        
+        finally:
+            # Clean up temporary file
+            try:
+                os.remove(pdf_path)
+            except:
+                pass
+        
+        return JsonResponse(response_data)
+    
+    return JsonResponse({
+        "message": "Please upload a PDF file via POST request",
+        "document_type": "",
+        "extracted_text": ""
+    })
 
 # URL patterns
 urlpatterns = [
     path("upload/", upload_pdf),
+    path("", upload_pdf),  # Add root path for easier access
 ]
 
 # Create WSGI application
