@@ -64,14 +64,19 @@ const ViewInternshipDetails = () => {
     const filtered = studentsData.filter(student => {   
       if (
         student.name.toLowerCase().includes(searchTermLower) ||
-        student.register_number.toLowerCase().includes(searchTermLower)
+        student.register_number.toLowerCase().includes(searchTermLower) || 
+        student.section.toLowerCase().includes(searchTermLower) || 
+        student.mobile_number.toLowerCase().includes(searchTermLower)
       ) {
         return true;
       }
       
       const hasMatchingInternship = student.internships.some(internship => 
         (internship.companyName || "").toLowerCase().includes(searchTermLower) ||
-        (internship.role || "").toLowerCase().includes(searchTermLower)
+        (internship.role || "").toLowerCase().includes(searchTermLower) || 
+        (internship.placementType || "").toLowerCase().includes(searchTermLower) ||
+        (internship.researchIndustry || "").toLowerCase().includes(searchTermLower) ||
+        (internship.location || "").toLowerCase().includes(searchTermLower)
       );
 
       return hasMatchingInternship;
@@ -192,7 +197,7 @@ const ViewInternshipDetails = () => {
           <input
             type="text"
             className="search-input"
-            placeholder="Search by name, register number, company, or role..."
+            placeholder="Search by name, class (CSE-A/B/C), company, or role..."
             value={searchTerm}
             onChange={handleSearchChange}
           />
