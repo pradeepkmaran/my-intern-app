@@ -67,7 +67,7 @@ def upload_pdf(request):
         try:
             extracted_text = extract_text_from_pdf(pdf_path)
             document_type = classify_document(extracted_text)
-            result = f"{document_type}"
+            result = f"{document_type}\n\nExtracted Text Preview:\n{extracted_text}..."
         except Exception as e:
             result = f"Error processing PDF: {str(e)}"
         
@@ -81,11 +81,15 @@ def upload_pdf(request):
 
 # URL patterns
 urlpatterns = [
-    path("upload", upload_pdf),
+    path("upload/", upload_pdf),
 ]
 
+# Create WSGI application
 application = get_wsgi_application()
+
+# Expose as 'app' for Vercel
+app = application
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "__main__")
-    execute_from_command_line(sys.argv) 
+    execute_from_command_line(sys.argv)
