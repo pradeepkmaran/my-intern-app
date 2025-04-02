@@ -10,7 +10,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UploadInternshipDetailsPage from "./pages/StudentPages/UploadInternshipDetails/UploadInternshipDetails";
 import EditInternshipDetailsPage from "./pages/StudentPages/EditInternshipDetails/EditInternshipDetails";
 import StudentViewInternshipDetailsPage from "./pages/StudentPages/ViewInternshipDetails/ViewInternshipDetails";
-import VerifyInternshipDetailsPage from "./pages/FacultyPages/VerifyInternshipDetails/VerifyInternshipDetails";
 import FacultyViewInternshipDetailsPage from "./pages/FacultyPages/ViewInternshipDetails/ViewInternshipDetails";
 
 function App() {
@@ -37,7 +36,6 @@ function App() {
           <Route element={<ProtectedRoute user={user} allowedRoles={["faculty"]} />}>
             <Route path="/faculty/home" element={<FacultyHome />} />
             <Route path="/faculty/view-internship-details" element={<FacultyViewInternshipDetailsPage />} />
-            <Route path="/faculty/verify-internship-details" element={<VerifyInternshipDetailsPage />} />
           </Route>
           
           <Route path="/unauthorized" element={<h1>Whoops! You are not authorized :\</h1>} />

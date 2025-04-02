@@ -11,11 +11,17 @@ const internshipSchema = new mongoose.Schema({
   researchIndustry: String,
   location: String,
   permissionLetter: String,
+  permissionLetterStatus: String,
+  offerLetter: String,
+  offerLetterStatus: String,
   completionCertificate: String,
+  completionCertificateStatus: String,
   internshipReport: String,
+  internshipReportStatus: String,
   studentFeedback: String,
+  studentFeedbackStatus: String,
   employerFeedback: String,
-  proofLinks: [String]
+  employerFeedbackStatus: String
 });
 
 const studentUserSchema = new mongoose.Schema({

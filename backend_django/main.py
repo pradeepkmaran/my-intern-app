@@ -19,9 +19,9 @@ from pdfminer.pdfparser import PDFParser
 
 # Basic settings
 settings.configure(
-    DEBUG=True,
+    DEBUG=False,
     ROOT_URLCONF=__name__,
-    SECRET_KEY='a_very_secret_key',
+    SECRET_KEY='1_d0nt_kn0w_what_t0_keep',
     ALLOWED_HOSTS=['*'],
 )
 
@@ -44,26 +44,31 @@ def extract_text_from_pdf(pdf_path):
 # Function to classify document type
 def classify_document(text):
     categories = {
-        "Signed Permission Letter": ["permission letter", "signed letter", "approval"],
-        "Offer Letter": ["offer letter", "employment offer", "job offer"],
-        "Completion Certificate": ["completion certificate", "certification", "internship completed"],
-        "Internship Report": ["internship report", "work summary", "project report"],
-        "Student Feedback (About Internship)": ["student feedback", "internship experience", "review"],
-        "Employer Feedback (About student)": ["employer feedback", "performance review", "student evaluation"]
+        "permissionLetter": ["permission letter", "signed letter", "approval"],
+        "offerLetter": ["offer letter", "employment offer", "job offer"],
+        "completionCertificate": ["completion certificate", "certification", "internship completed"],
+        "internshipReport": ["internship report", "work summary", "project report"],
+        "studentFeedback": ["student feedback", "internship experience", "review"],
+        "employerFeedback": ["employer feedback", "performance review", "student evaluation"]
     }
     
     for category, keywords in categories.items():
         if any(keyword.lower() in text.lower() for keyword in keywords):
             return category
-    return "Unknown"
+    return "unknown"
 
 # View function with JSON response
 @csrf_exempt
 def upload_pdf(request):
+    print("Request method:", request.method)
+    print("Request headers:", request.headers)
+    print("Files in request:", request.FILES)
+    print("File keys:", list(request.FILES.keys()) if request.FILES else "No files")
+    
     if request.method == "POST" and request.FILES.get("pdf"):
         pdf_file = request.FILES["pdf"]
         pdf_path = f"/tmp/{pdf_file.name}"
-        
+
         response_data = {
             "message": "",
             "document_type": "",
@@ -85,7 +90,7 @@ def upload_pdf(request):
             response_data["document_type"] = document_type
             response_data["extracted_text"] = extracted_text
             
-        except Exception as e:
+        except Exception as e: 
             response_data["message"] = f"Error processing PDF: {str(e)}"
         
         finally:

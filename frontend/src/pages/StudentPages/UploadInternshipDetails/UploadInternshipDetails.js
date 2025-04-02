@@ -15,14 +15,17 @@ const UploadInternshipDetails = () => {
     stipend: "",
     researchIndustry: "",
     location: "",
-    permissionLetter: false,
-    completionCertificate: false,
-    internshipReport: false,
-    studentFeedback: false,
-    employerFeedback: false,
   });
 
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState({
+    offerLetter: null,
+    permissionLetter: null,
+    completionCertificate: null,
+    internshipReport: null,
+    studentFeedback: null,
+    employerFeedback: null,
+  });
+  
   const [uploadStatus, setUploadStatus] = useState("");
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -36,8 +39,12 @@ const UploadInternshipDetails = () => {
   };
 
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    const { name, files } = e.target;
+    if (files && files[0]) {
+      setFiles(prevFiles => ({
+        ...prevFiles,
+        [name]: files[0]
+      }));
     }
   };
   
@@ -47,12 +54,15 @@ const UploadInternshipDetails = () => {
     const formDataToSend = new FormData();
   
     Object.entries(formData).forEach(([key, value]) => {
-      formDataToSend.append(key, value.toString());
+      formDataToSend.append(key, value);
     });
-  
-    if (file) {
-      formDataToSend.append("internshipFile", file);
-    }
+
+    Object.entries(files).forEach(([key, file]) => {
+      if (file) {
+        formDataToSend.append("documents", file);
+        formDataToSend.append(`documentType_${file.name}`, key);
+      }
+    });
   
     try {
       const response = await fetch(
@@ -69,7 +79,7 @@ const UploadInternshipDetails = () => {
       const data = await response.json();
       if (response.ok) {
         setUploadStatus("Internship details uploaded successfully!");
-        navigate('/student/view-internship-details')
+        navigate('/student/view-internship-details');
       } else {
         setUploadStatus(data.error || "Upload failed. Try again.");
       }
@@ -82,8 +92,7 @@ const UploadInternshipDetails = () => {
   return (
     <div className="container">
       <div className="header">
-        <Upload size={32} />
-        <h1>Internship Details Form</h1>
+        <h1><Upload size={28} /> Internship Details Form</h1>
       </div>
 
       <form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -157,41 +166,34 @@ const UploadInternshipDetails = () => {
                 <option value="Abroad">Abroad</option>
               </select>
             </div>
-
-            <div className="input-group">
-              <label>Upload Offer/Completion Letter</label>
-              <input type="file" onChange={handleFileChange} accept=".pdf,.doc,.docx,image/*" required className="file-input" />
-            </div>
           </div>
         </div>
 
         <div className="card documents">
-          <h2>Document Checklist</h2>
-          <div className="checkbox-grid">
-            <label className="checkbox-wrapper">
-              <input type="checkbox" name="permissionLetter" checked={formData.permissionLetter} onChange={handleChange} />
-              <span>Signed Permission Letter, Offer Letter Submitted</span>
-            </label>
-
-            <label className="checkbox-wrapper">
-              <input type="checkbox" name="completionCertificate" checked={formData.completionCertificate} onChange={handleChange} />
-              <span>Completion Certificate Submitted</span>
-            </label>
-
-            <label className="checkbox-wrapper">
-              <input type="checkbox" name="internshipReport" checked={formData.internshipReport} onChange={handleChange} />
-              <span>Internship Report Submitted</span>
-            </label>
-
-            <label className="checkbox-wrapper">
-              <input type="checkbox" name="studentFeedback" checked={formData.studentFeedback} onChange={handleChange} />
-              <span>Student Feedback Submitted</span>
-            </label>
-
-            <label className="checkbox-wrapper">
-              <input type="checkbox" name="employerFeedback" checked={formData.employerFeedback} onChange={handleChange} />
-              <span>Employer Feedback Submitted</span>
-            </label>
+          <h2>Document Uploads</h2>
+          <div className="input-group">
+              <label>Offer Letter</label>
+              <input type="file" name="offerLetter" onChange={handleFileChange} accept=".pdf" className="file-input" />
+          </div>
+          <div className="input-group">
+              <label>Signed Permission Letter</label>
+              <input type="file" name="permissionLetter" onChange={handleFileChange} accept=".pdf" className="file-input" />
+          </div>
+          <div className="input-group">
+              <label>Completion Certificate</label>
+              <input type="file" name="completionCertificate" onChange={handleFileChange} accept=".pdf" className="file-input" />
+          </div>
+          <div className="input-group">
+              <label>Internship Report</label>
+              <input type="file" name="internshipReport" onChange={handleFileChange} accept=".pdf" className="file-input" />
+          </div>
+          <div className="input-group">
+              <label>Student Feedback (About the internship)</label>
+              <input type="file" name="studentFeedback" onChange={handleFileChange} accept=".pdf" className="file-input" />
+          </div>
+          <div className="input-group">
+              <label>Employer Feedback (About the student)</label>
+              <input type="file" name="employerFeedback" onChange={handleFileChange} accept=".pdf" className="file-input" />
           </div>
         </div>
 

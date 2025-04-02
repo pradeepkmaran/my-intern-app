@@ -3,10 +3,11 @@
   max-width: 1200px;
   margin: 2rem auto;
   padding: 0 1rem;
+  display: block;
 }
 
 .header {
-  display: flex;
+  display: block;
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
@@ -69,6 +70,7 @@
 .input-group input[type="text"],
 .input-group input[type="date"],
 .input-group select {
+  width: 90%;
   padding: 0.75rem;
   border: 1px solid #e2e8f0;
   border-radius: 6px;

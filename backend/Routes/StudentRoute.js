@@ -6,7 +6,7 @@ import StudentInternshipDetailsUpdateController from "../Controllers/StudentCont
 
 const StudentRoute = express.Router();
 
-StudentRoute.post("/upload-internship-details", upload.single("internshipFile"), UploadInternshipDetailsController);
+StudentRoute.post("/upload-internship-details", UploadInternshipDetailsController);
 StudentRoute.get("/my-internships", MyInternshipsController);
 StudentRoute.get("/my-internships/:internshipId", StudentInternshipDetailsController);
 StudentRoute.put("/my-internships/update/:internshipId", StudentInternshipDetailsUpdateController);

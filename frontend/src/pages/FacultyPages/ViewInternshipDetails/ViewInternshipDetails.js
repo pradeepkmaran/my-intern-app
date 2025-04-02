@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../../../context/AuthContext";
+import { AuthContext } from "../../../context/AuthContext.jsx";
+import { ExternalLink } from 'lucide-react';
 import "./ViewInternshipDetails.css";
 
 const ViewInternshipDetails = () => {
@@ -178,6 +179,18 @@ const ViewInternshipDetails = () => {
 
   const clearSearch = () => {
     setSearchTerm("");
+  };
+
+  // Check if a document is verified (returns true, false, or null if not available)
+  const isDocumentVerified = (internship, docType) => {
+    if (!internship || !docType) return null;
+    return internship[`${docType}Status`] === "Yes";
+  };
+
+  // Get document link safely
+  const getDocumentLink = (internship, docType) => {
+    if (!internship || !docType || !internship[docType]) return null;
+    return internship[docType] || null;
   };
 
   return (
@@ -386,39 +399,69 @@ const ViewInternshipDetails = () => {
                     <span className="detail-label">Location</span>
                     <span className="detail-value">{selectedInternship.location || "N/A"}</span>
                   </div>
-                  <div className="detail-item">
-                    <span className="detail-label">Internship Order</span>
-                    <span className="detail-value">
-                      <a href={selectedInternship.proofLinks && selectedInternship.proofLinks[0] ? selectedInternship.proofLinks[0] : "#"} target="_blank" rel="noopener noreferrer">
-                        {selectedInternship.proofLinks && selectedInternship.proofLinks[0] ? "View" : "N/A"}
-                      </a>
-                    </span>
-                  </div>
                 </div>
               </div>
               
               <div className="details-section">
                 <h4 className="section-title">Documentation Status</h4>
                 <div className="documentation-status">
-                  <div className={`status-item ${selectedInternship.permissionLetter === "true" ? "completed" : "pending"}`}>
-                    <span className="status-icon">{selectedInternship.permissionLetter === "true" ? "✓" : "○"}</span>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'permissionLetter') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'permissionLetter') ? "✓" : "○"}</span></div>
                     <span className="status-label">Permission & Offer Letters</span>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'permissionLetter') ? <a href={getDocumentLink(selectedInternship, 'permissionLetter')}><ExternalLink size={20} /></a> : <></> }</div>
                   </div>
-                  <div className={`status-item ${selectedInternship.completionCertificate === "true" ? "completed" : "pending"}`}>
-                    <span className="status-icon">{selectedInternship.completionCertificate === "true" ? "✓" : "○"}</span>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'offerLetter') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'offerLetter') ? "✓" : "○"}</span></div>
+                    <span className="status-label">Permission & Offer Letters</span>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'offerLetter') ? <a href={getDocumentLink(selectedInternship, 'offerLetter')}><ExternalLink size={20} /></a> : <></> }</div>
+                  </div>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'completionCertificate') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'completionCertificate') ? "✓" : "○"}</span></div>
                     <span className="status-label">Completion Certificate</span>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'completionCertificate') ? <a href={getDocumentLink(selectedInternship, 'completionCertificate')}><ExternalLink size={20} /></a> : <></> }</div>
                   </div>
-                  <div className={`status-item ${selectedInternship.internshipReport === "true" ? "completed" : "pending"}`}>
-                    <span className="status-icon">{selectedInternship.internshipReport === "true" ? "✓" : "○"}</span>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'internshipReport') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'internshipReport') ? "✓" : "○"}</span></div>
                     <span className="status-label">Internship Report</span>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'internshipReport') ? <a href={getDocumentLink(selectedInternship, 'internshipReport')}><ExternalLink size={20} /></a> : <></> }</div>
                   </div>
-                  <div className={`status-item ${selectedInternship.studentFeedback === "true" ? "completed" : "pending"}`}>
-                    <span className="status-icon">{selectedInternship.studentFeedback === "true" ? "✓" : "○"}</span>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'studentFeedback') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'studentFeedback') ? "✓" : "○"}</span></div>
                     <span className="status-label">Student Feedback</span>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'studentFeedback') ? <a href={getDocumentLink(selectedInternship, 'studentFeedback')}><ExternalLink size={20} /></a> : <></> }</div>
                   </div>
-                  <div className={`status-item ${selectedInternship.employerFeedback === "true" ? "completed" : "pending"}`}>
-                    <span className="status-icon">{selectedInternship.employerFeedback === "true" ? "✓" : "○"}</span>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'employerFeedback') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'employerFeedback') ? "✓" : "○"}</span></div>
                     <span className="status-label">Employer Feedback</span>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'employerFeedback') ? <a href={getDocumentLink(selectedInternship, 'employerFeedback')}><ExternalLink size={20} /></a> : <></> }</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="details-section">
+                <h4 className="section-title">Verification Summary</h4>
+                <div className="verification-progress">
+                  <div className="progress-bar-container">
+                    <div className="progress-bar" style={{ 
+                      width: `${[
+                        isDocumentVerified(selectedInternship, 'permissionLetter'),
+                        isDocumentVerified(selectedInternship, 'offerLetter'),
+                        isDocumentVerified(selectedInternship, 'completionCertificate'),
+                        isDocumentVerified(selectedInternship, 'internshipReport'),
+                        isDocumentVerified(selectedInternship, 'studentFeedback'),
+                        isDocumentVerified(selectedInternship, 'employerFeedback')
+                      ].filter(Boolean).length / 6 * 100}%` 
+                    }}></div>
+                  </div>
+                  <div className="verification-status-text">
+                    {[
+                      isDocumentVerified(selectedInternship, 'permissionLetter'),
+                      isDocumentVerified(selectedInternship, 'offerLetter'),
+                      isDocumentVerified(selectedInternship, 'completionCertificate'),
+                      isDocumentVerified(selectedInternship, 'internshipReport'),
+                      isDocumentVerified(selectedInternship, 'studentFeedback'),
+                      isDocumentVerified(selectedInternship, 'employerFeedback')
+                    ].filter(Boolean).length} of 6 documents verified
                   </div>
                 </div>
               </div>

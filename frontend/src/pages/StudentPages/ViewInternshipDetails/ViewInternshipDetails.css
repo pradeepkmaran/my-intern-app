@@ -314,6 +314,7 @@
 .status-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   padding: 0.8rem;
   border-radius: 8px;
   background-color: #f9fafb;
@@ -321,11 +322,15 @@
 }
 
 .status-item.completed {
-  background-color: #ecfdf5;
+  background-color: #d0ffe9;
 }
 
 .status-item.pending {
-  background-color: #fef2f2;
+  background-color: #ffd5d5;
+}
+
+.status-icon-box {
+  width: 10%;
 }
 
 .status-icon {
@@ -351,8 +356,14 @@
 }
 
 .status-label {
-  font-size: 0.95rem;
+  font-size: 0.90rem;
   font-weight: 500;
+}
+
+.document-link {
+  width: 30%;
+  display: flex;
+  justify-content: end;
 }
 
 /* Responsive adjustments */
