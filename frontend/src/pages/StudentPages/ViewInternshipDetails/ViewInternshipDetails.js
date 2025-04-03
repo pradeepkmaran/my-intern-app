@@ -218,15 +218,15 @@ const ViewInternshipDetails = () => {
               <div className="details-section">
                 <h4 className="section-title">Documentation Status</h4>
                 <div className="documentation-status">
-                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'permissionLetter') ? "completed" : "pending"}`}>
-                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'permissionLetter') ? "✓" : "○"}</span></div>
-                    <span className="status-label">Permission & Offer Letters </span> 
-                    <div className="document-link">{ getDocumentLink(selectedInternship, 'permissionLetter') ? <a href={getDocumentLink(selectedInternship, 'permissionLetter')}><ExternalLink size={20} /></a> : <></> }</div>
-                  </div>
                   <div className={`status-item ${isDocumentVerified(selectedInternship, 'offerLetter') ? "completed" : "pending"}`}>
                     <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'offerLetter') ? "✓" : "○"}</span></div>
-                    <span className="status-label">Permission & Offer Letters</span>
+                    <span className="status-label">Offer Letter</span>
                     <div className="document-link">{ getDocumentLink(selectedInternship, 'offerLetter') ? <a href={getDocumentLink(selectedInternship, 'offerLetter')}><ExternalLink size={20} /></a> : <></> }</div>
+                  </div>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'permissionLetter') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'permissionLetter') ? "✓" : "○"}</span></div>
+                    <span className="status-label">Permission Letter</span> 
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'permissionLetter') ? <a href={getDocumentLink(selectedInternship, 'permissionLetter')}><ExternalLink size={20} /></a> : <></> }</div>
                   </div>
                   <div className={`status-item ${isDocumentVerified(selectedInternship, 'completionCertificate')? "completed" : "pending"}`}>
                     <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'completionCertificate')? "✓" : "○"}</span></div>
