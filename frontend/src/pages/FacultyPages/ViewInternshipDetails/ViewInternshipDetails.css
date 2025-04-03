@@ -312,6 +312,12 @@
     font-size: 3rem;
     margin-bottom: 1rem;
   }
+
+  .no-internships-cell {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
   
   /* Responsive tweaks for the faculty view */
   @media (max-width: 1200px) {

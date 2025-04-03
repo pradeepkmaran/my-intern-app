@@ -34,10 +34,10 @@ const ViewInternshipDetails = () => {
           // Adding a verification status field if it doesn't exist
           const enhancedData = data.studentDetails.map(student => ({
             ...student,
-            internships: student.internships.map(internship => ({
+            internships: student.internships?.length ? student.internships.map(internship => ({
               ...internship,
               verificationStatus: internship.verificationStatus || "pending" // Use existing or default to pending
-            }))
+            })) : [] // Ensure internships is an array even if it's empty
           }));
           setStudentsData(enhancedData);
           setFilteredData(enhancedData);
@@ -66,21 +66,25 @@ const ViewInternshipDetails = () => {
       if (
         student.name.toLowerCase().includes(searchTermLower) ||
         student.register_number.toLowerCase().includes(searchTermLower) || 
-        student.section.toLowerCase().includes(searchTermLower) || 
-        student.mobile_number.toLowerCase().includes(searchTermLower)
+        student.section?.toLowerCase().includes(searchTermLower) || 
+        student.mobile_number?.toLowerCase().includes(searchTermLower)
       ) {
         return true;
       }
       
-      const hasMatchingInternship = student.internships.some(internship => 
-        (internship.companyName || "").toLowerCase().includes(searchTermLower) ||
-        (internship.role || "").toLowerCase().includes(searchTermLower) || 
-        (internship.placementType || "").toLowerCase().includes(searchTermLower) ||
-        (internship.researchIndustry || "").toLowerCase().includes(searchTermLower) ||
-        (internship.location || "").toLowerCase().includes(searchTermLower)
-      );
+      // Only check internships if they exist
+      if (student.internships && student.internships.length > 0) {
+        const hasMatchingInternship = student.internships.some(internship => 
+          (internship.companyName || "").toLowerCase().includes(searchTermLower) ||
+          (internship.role || "").toLowerCase().includes(searchTermLower) || 
+          (internship.placementType || "").toLowerCase().includes(searchTermLower) ||
+          (internship.researchIndustry || "").toLowerCase().includes(searchTermLower) ||
+          (internship.location || "").toLowerCase().includes(searchTermLower)
+        );
+        return hasMatchingInternship;
+      }
 
-      return hasMatchingInternship;
+      return false;
     });
 
     setFilteredData(filtered);
@@ -119,23 +123,6 @@ const ViewInternshipDetails = () => {
     );
     
     // In a real implementation, you would make an API call here
-    // Example:
-    // fetch(`${process.env.REACT_APP_BACKEND_URL}/api/user/faculty/verify-internship/${internshipId}`, {
-    //   method: "PUT",
-    //   headers: {
-    //     "Authorization": `Bearer ${user?.access_token}`,
-    //     "Content-Type": "application/json"
-    //   },
-    //   body: JSON.stringify({ status: "verified" })
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //   if (data.success) {
-    //     // Handle success
-    //   } else {
-    //     // Handle error, revert UI change
-    //   }
-    // });
   };
 
   // Dummy handler function for unverify button
@@ -266,9 +253,21 @@ const ViewInternshipDetails = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredData.map(student => (
-                student.internships.map((internship, index) => (
-                  <tr key={`${student._id}-${internship._id}`}>
+              {filteredData.map(student => {
+                // If student has no internships, render a single row with student info
+                if (!student.internships || student.internships.length === 0) {
+                  return (
+                    <tr key={student._id}>
+                      <td className="register-number">{student.register_number}</td>
+                      <td className="student-name">{student.name}</td>
+                      <td colSpan="6" className="no-internships-cell">No internships recorded</td>
+                    </tr>
+                  );
+                }
+                
+                // If student has internships, render them as before
+                return student.internships.map((internship, index) => (
+                  <tr key={`${student._id}-${internship._id || index}`}>
                     {index === 0 && (
                       <>
                         <td rowSpan={student.internships.length} className="register-number">
@@ -319,8 +318,8 @@ const ViewInternshipDetails = () => {
                       )}
                     </td>
                   </tr>
-                ))
-              ))}
+                ));
+              })}
             </tbody>
           </table>
         </div>
@@ -475,6 +474,8 @@ const ViewInternshipDetails = () => {
 
 // Helper function to determine completion status
 const getCompletionStatus = (internship) => {
+  if (!internship) return "incomplete";
+  
   const requiredDocs = [
     internship.permissionLetter === "true",
     internship.completionCertificate === "true", 
