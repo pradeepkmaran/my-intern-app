@@ -141,6 +141,9 @@ const ViewInternshipDetails = () => {
         
         if (filters.endDate && new Date(internship.endDate) > new Date(filters.endDate)) return false;
         
+        if (filters.companyName && 
+            internship.companyName.toLowerCase() !== filters.companyName.toLowerCase()) return false;
+
         if (filters.placementSource && 
             internship.placementType !== filters.placementSource) return false;
         
