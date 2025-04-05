@@ -11,6 +11,24 @@ const ViewInternshipDetails = () => {
   const [selectedInternship, setSelectedInternship] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useContext(AuthContext);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    internshipObtained: "",
+    duration: "",
+    startDate: "",
+    endDate: "",
+    companyName: "",
+    placementSource: "",
+    stipend: "",
+    internshipType: "",
+    location: "",
+    offerVerified: "",
+    permissionVerified: "",
+    completionVerified: "",
+    internshipVerified: "",
+    studentVerified: "",
+    companyVerified: "",
+  });
 
   useEffect(() => {
     const fetchInternships = async () => {
@@ -56,13 +74,20 @@ const ViewInternshipDetails = () => {
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
-      setFilteredData(studentsData);
+      // Apply filters but not search term
+      applyAllFilters(studentsData);
       return;
     }
 
-    const searchTermLower = searchTerm.toLowerCase();
+    // Apply both search and filters
+    const searchFiltered = applySearch(studentsData, searchTerm);
+    applyAllFilters(searchFiltered);
+  }, [searchTerm, studentsData]);
+
+  const applySearch = (data, term) => {
+    const searchTermLower = term.toLowerCase();
     
-    const filtered = studentsData.filter(student => {   
+    return data.filter(student => {   
       if (
         student.name.toLowerCase().includes(searchTermLower) ||
         student.register_number.toLowerCase().includes(searchTermLower) || 
@@ -86,9 +111,103 @@ const ViewInternshipDetails = () => {
 
       return false;
     });
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const applyAllFilters = (data) => {
+    // If no filters are applied, return data as is (just with search if applicable)
+    if (!Object.values(filters).some(val => val)) {
+      setFilteredData(data);
+      return;
+    }
+
+    const filtered = data.filter(student => {
+      // Keep students with no internships if not filtering by internship fields
+      // if (!student.internships || student.internships.length === 0) {
+      //   return !filters.internshipObtained || filters.internshipObtained === "no";
+      // }
+
+      // If filtering by internships, check if any internship matches
+      const hasMatchingInternship = student.internships.some(internship => {
+        // Filter by each criterion
+        if (filters.internshipObtained === "no") return false;
+        
+        if (filters.duration && parseInt(internship.period) !== parseInt(filters.duration)) return false;
+        
+        if (filters.startDate && new Date(internship.startDate) < new Date(filters.startDate)) return false;
+        
+        if (filters.endDate && new Date(internship.endDate) > new Date(filters.endDate)) return false;
+        
+        if (filters.placementSource && 
+            internship.placementType !== filters.placementSource) return false;
+        
+        if (filters.internshipType && 
+            internship.researchIndustry?.toLowerCase() !== filters.internshipType.toLowerCase()) return false;
+        
+        if (filters.location && 
+            !internship.location?.toLowerCase().includes(filters.location.toLowerCase())) return false;
+        
+        if (filters.offerVerified && 
+            (internship.offerLetterStatus === "Yes") !== (filters.offerVerified === "yes")) return false;
+
+        if (filters.permissionVerified && 
+            (internship.permissionLetterStatus === "Yes") !== (filters.permissionVerified === "yes")) return false;
+        
+        if (filters.completionVerified && 
+            (internship.completionCertificateStatus === "Yes") !== (filters.completionVerified === "yes")) return false;
+        
+        if (filters.internshipVerified && 
+            (internship.internshipReportStatus === "Yes") !== (filters.internshipVerified === "yes")) return false;
+        
+        if (filters.studentVerified && 
+            (internship.studentFeedbackStatus === "Yes") !== (filters.studentVerified === "yes")) return false;
+        
+        if (filters.companyVerified && 
+            (internship.employerFeedbackStatus === "Yes") !== (filters.companyVerified === "yes")) return false;
+        
+        // If it passed all filters, it's a match
+        return true;
+      });
+
+      return hasMatchingInternship || 
+        (filters.internshipObtained === "no" && (!student.internships || student.internships.length === 0));
+    });
 
     setFilteredData(filtered);
-  }, [searchTerm, studentsData]);
+  };
+
+  const applyFilters = () => {
+    applyAllFilters(searchTerm ? applySearch(studentsData, searchTerm) : studentsData);
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      internshipObtained: "",
+      duration: "",
+      startDate: "",
+      endDate: "",
+      companyName: "",
+      placementSource: "",
+      stipend: "",
+      internshipType: "",
+      location: "",
+      permissionVerified: "",
+      completionVerified: "",
+      internshipVerified: "",
+      studentVerified: "",
+      companyVerified: "",
+    });
+    
+    // Reset to just search results or all data
+    if (searchTerm) {
+      setFilteredData(applySearch(studentsData, searchTerm));
+    } else {
+      setFilteredData(studentsData);
+    }
+  };
 
   const handleViewDetails = (internship) => {
     setSelectedInternship(internship);
@@ -212,6 +331,233 @@ const ViewInternshipDetails = () => {
         </div>
       </div>
 
+      {/* Filters Toggle Button */}
+      <div className="dashboard-header">
+        <button
+          className={`toggle-filters-btn ${showFilters ? 'active' : ''}`}
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          {showFilters ? "Hide Filters" : "Show Filters"}
+          <span className="toggle-icon">{showFilters ? "▲" : "▼"}</span>
+        </button>
+      </div>
+
+      {/* Filter Panel */}
+      {showFilters && (
+        <div className="filter-panel">
+          <div className="filter-grid">
+            {/* Basic Info */}
+            <div className="filter-section">
+              <h3 className="section-title">Basic Info</h3>
+              <div className="filter-group">
+                <label>Internship Obtained</label>
+                <select
+                  value={filters.internshipObtained}
+                  onChange={(e) => handleFilterChange("internshipObtained", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Duration (weeks)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={filters.duration}
+                  onChange={(e) => handleFilterChange("duration", e.target.value)}
+                />
+              </div>
+
+              <div className="date-group">
+                <div className="filter-group">
+                  <label>Start Date</label>
+                  <input
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) => handleFilterChange("startDate", e.target.value)}
+                  />
+                </div>
+                <div className="filter-group">
+                  <label>End Date</label>
+                  <input
+                    type="date"
+                    value={filters.endDate}
+                    onChange={(e) => handleFilterChange("endDate", e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Company Info */}
+            <div className="filter-section">
+              <h3 className="section-title">Company Info</h3>
+              <div className="filter-group">
+                <label>Company Name</label>
+                <input
+                  type="text"
+                  value={filters.companyName}
+                  onChange={(e) => handleFilterChange("companyName", e.target.value)}
+                />
+              </div>
+
+              <div className="filter-group">
+                <label>Placement Source</label>
+                <select
+                  value={filters.placementSource}
+                  onChange={(e) => handleFilterChange("placementSource", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="Through College">Through College</option>
+                  <option value="Outside">Outside</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Stipend (₹)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={filters.stipend}
+                  onChange={(e) => handleFilterChange("stipend", e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Internship Details */}
+            <div className="filter-section">
+              <h3 className="section-title">Internship Details</h3>
+              <div className="filter-group">
+                <label>Internship Type</label>
+                <select
+                  value={filters.internshipType}
+                  onChange={(e) => handleFilterChange("internshipType", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="academic">Academic</option>
+                  <option value="industry">Industry</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Location</label>
+                <select
+                  value={filters.location}
+                  onChange={(e) => handleFilterChange("location", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="India">India</option>
+                  <option value="Abroad">Abroad</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Work Mode</label>
+                <select
+                  value={filters.workMode}
+                  onChange={(e) => handleFilterChange("workMode", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="remote">Online</option>
+                  <option value="onsite">Onsite</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Documents */}
+            <div className="filter-section">
+              <h3 className="section-title">Documents</h3>
+              <div className="filter-group">
+                <label>Offer Letter Verification</label>
+                <select
+                  value={filters.offerVerified}
+                  onChange={(e) => handleFilterChange("offerVerified", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Permission Letter Verification</label>
+                <select
+                  value={filters.permissionVerified}
+                  onChange={(e) => handleFilterChange("permissionVerified", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Completion Certificate Verification</label>
+                <select
+                  value={filters.completionVerified}
+                  onChange={(e) => handleFilterChange("completionVerified", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Internship Report Verification</label>
+                <select
+                  value={filters.internshipVerified}
+                  onChange={(e) => handleFilterChange("internshipVerified", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Feedback */}
+            <div className="filter-section">
+              <h3 className="section-title">Feedback</h3>
+              <div className="filter-group">
+                <label>Student Feedback Verification</label>
+                <select
+                  value={filters.studentVerified}
+                  onChange={(e) => handleFilterChange("studentVerified", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Company Feedback Verification</label>
+                <select
+                  value={filters.companyVerified}
+                  onChange={(e) => handleFilterChange("companyVerified", e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="filter-actions">
+            <button className="reset-btn" onClick={resetFilters}>
+              Reset
+            </button>
+            <button className="apply-btn" onClick={applyFilters}>
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="loading-container">
           <div className="loading-spinner"></div>
@@ -224,11 +570,14 @@ const ViewInternshipDetails = () => {
         </div>
       ) : filteredData.length === 0 ? (
         <div className="no-data-container">
-          {searchTerm ? (
+          {searchTerm || Object.values(filters).some(val => val) ? (
             <>
               <div className="no-data-icon">🔍</div>
-              <p>No results found for "{searchTerm}".</p>
-              <button className="reset-search-button" onClick={clearSearch}>Clear Search</button>
+              <p>No results found for your search or filter criteria.</p>
+              <button className="reset-search-button" onClick={() => {
+                clearSearch();
+                resetFilters();
+              }}>Clear All Filters</button>
             </>
           ) : (
             <>
@@ -404,15 +753,15 @@ const ViewInternshipDetails = () => {
               <div className="details-section">
                 <h4 className="section-title">Documentation Status</h4>
                 <div className="documentation-status">
-                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'permissionLetter') ? "completed" : "pending"}`}>
-                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'permissionLetter') ? "✓" : "○"}</span></div>
-                    <span className="status-label">Offer Letter</span>
-                    <div className="document-link">{ getDocumentLink(selectedInternship, 'offerLetter') ? <a href={getDocumentLink(selectedInternship, 'permissionLetter')}><ExternalLink size={20} /></a> : <></> }</div>
-                  </div>
                   <div className={`status-item ${isDocumentVerified(selectedInternship, 'offerLetter') ? "completed" : "pending"}`}>
                     <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'offerLetter') ? "✓" : "○"}</span></div>
+                    <span className="status-label">Offer Letter</span>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'offerLetter') ? <a href={getDocumentLink(selectedInternship, 'offerLetter')}><ExternalLink size={20} /></a> : <></> }</div>
+                  </div>
+                  <div className={`status-item ${isDocumentVerified(selectedInternship, 'permissionLetter') ? "completed" : "pending"}`}>
+                    <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'permissionLetter') ? "✓" : "○"}</span></div>
                     <span className="status-label">Signed Permission Letter</span>
-                    <div className="document-link">{ getDocumentLink(selectedInternship, 'offerLetter') ? <a href={getDocumentLink(selectedInternship, 'permissionLetter')}><ExternalLink size={20} /></a> : <></> }</div>
+                    <div className="document-link">{ getDocumentLink(selectedInternship, 'permissionLetter') ? <a href={getDocumentLink(selectedInternship, 'permissionLetter')}><ExternalLink size={20} /></a> : <></> }</div>
                   </div>
                   <div className={`status-item ${isDocumentVerified(selectedInternship, 'completionCertificate') ? "completed" : "pending"}`}>
                     <div className='statuc-icon-box'><span className="status-icon">{isDocumentVerified(selectedInternship, 'completionCertificate') ? "✓" : "○"}</span></div>

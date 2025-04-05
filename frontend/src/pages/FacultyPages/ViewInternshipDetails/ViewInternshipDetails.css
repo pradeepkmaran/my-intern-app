@@ -115,7 +115,6 @@
   .internship-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
     font-family: 'Poppins', sans-serif;
     overflow: hidden;
   }
@@ -136,6 +135,15 @@
     border-bottom: 1px solid #e2e8f0;
     color: #4b5563;
     vertical-align: middle;
+    text-align: center;
+  }
+
+  .internship-table tr:nth-child(odd)  {
+    background-color: #fbfbfb;
+  }
+
+  .internship-table tr:nth-child(even) {
+    background-color: #f8f8f8;
   }
   
   .internship-table tr:last-child td {
@@ -143,7 +151,7 @@
   }
   
   .internship-table tr:hover {
-    background-color: #f9fafb;
+    background-color: #ededed;
   }
   
   .student-name {
@@ -213,7 +221,6 @@
   .action-buttons {
     display: flex;
     gap: 0.5rem;
-    flex-wrap: wrap;
   }
   
   /* View button */
@@ -371,3 +378,209 @@
       font-size: 0.9rem;
     }
   }
+
+  /* Filter Toggle Button and Header */
+.dashboard-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-filters-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.toggle-filters-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.toggle-filters-btn.active {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.toggle-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+/* Filter Panel */
+.filter-panel {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Filter Sections */
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0 0 0.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Filter Groups */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.filter-group select,
+.filter-group input {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  color: #1e293b;
+  background-color: white;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.filter-group input[type="date"] {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Date Group for side-by-side date inputs */
+.date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.date-group .filter-group {
+  flex: 1;
+}
+
+/* Filter Actions */
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.reset-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+}
+
+.reset-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.apply-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+}
+
+.apply-btn:hover {
+  background-color: #2563eb;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .filter-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .date-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-panel {
+    padding: 1.2rem;
+  }
+  
+  .filter-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .section-title {
+    font-size: 0.95rem;
+  }
+  
+  .filter-actions {
+    flex-direction: column-reverse;
+    gap: 0.8rem;
+  }
+  
+  .reset-btn, 
+  .apply-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
