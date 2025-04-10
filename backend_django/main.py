@@ -73,7 +73,7 @@ def upload_pdf(request):
 
         response_data = {
             "message": "",
-            "date": "",
+            "dates": "",
         }
         
         try:
@@ -85,7 +85,7 @@ def upload_pdf(request):
             date = extract_dates(extracted_text)
             
             response_data["message"] = "PDF processed successfully"
-            response_data["date"] = date
+            response_data["dates"] = date
             
         except Exception as e: 
             response_data["message"] = f"Error processing PDF: {str(e)}"
@@ -100,8 +100,7 @@ def upload_pdf(request):
     
     return JsonResponse({
         "message": "Please upload a PDF file via POST request",
-        "document_type": "",
-        "extracted_text": ""
+        "dates": "",
     })
 
 # URL patterns
