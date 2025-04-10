@@ -8,8 +8,9 @@ from django.core.wsgi import get_wsgi_application
 from django.urls import path
 from django.core.management import execute_from_command_line
 from django.views.decorators.csrf import csrf_exempt
+import re
+from dateparser import parse
 
-# Import PDFMiner components
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfdocument import PDFDocument
@@ -17,7 +18,6 @@ from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
 
-# Basic settings
 settings.configure(
     DEBUG=False,
     ROOT_URLCONF=__name__,
@@ -25,9 +25,7 @@ settings.configure(
     ALLOWED_HOSTS=['*'],
 )
 
-# Function to process PDF and extract text using PDFMiner
 def extract_text_from_pdf(pdf_path):
-    """Extract text from PDF using PDFMiner"""
     output_string = io.StringIO()
     with open(pdf_path, 'rb') as in_file:
         parser = PDFParser(in_file)
@@ -41,25 +39,29 @@ def extract_text_from_pdf(pdf_path):
     
     return output_string.getvalue()
 
-# Function to classify document type
-def classify_document(text):
-    categories = {
-        "permissionLetter": ["permission letter", "signed letter", "approval"],
-        "offerLetter": ["offer letter", "employment offer", "job offer"],
-        "completionCertificate": ["completion certificate", "certification", "internship completed"],
-        "internshipReport": ["internship report", "work summary", "project report"],
-        "studentFeedback": ["student feedback", "internship experience", "review"],
-        "employerFeedback": ["employer feedback", "performance review", "student evaluation"]
-    }
+def extract_dates(text):
+    date_patterns = [
+        r"\b\d{1,2} [A-Za-z]+ \d{4}\b",  # Example: "16 June 2025"
+        r"\b[A-Za-z]+ \d{1,2},? \d{4}\b", # Example: "June 16, 2025"
+        r"\b\d{1,2}/\d{1,2}/\d{4}\b",    # Example: "16/06/2025"
+        r"\b\d{4}-\d{2}-\d{2}\b"         # Example: "2025-10-06"
+    ]
     
-    for category, keywords in categories.items():
-        if any(keyword.lower() in text.lower() for keyword in keywords):
-            return category
-    return "unknown"
+    found_dates = []
+    
+    for pattern in date_patterns:
+        matches = re.findall(pattern, text)
+        for match in matches:
+            parsed_date = parse(match)
+            if parsed_date:
+                found_dates.append(parsed_date.strftime("%Y-%m-%d"))
+    
+    return found_dates
 
-# View function with JSON response
+
 @csrf_exempt
 def upload_pdf(request):
+
     print("Request method:", request.method)
     print("Request headers:", request.headers)
     print("Files in request:", request.FILES)
@@ -71,30 +73,24 @@ def upload_pdf(request):
 
         response_data = {
             "message": "",
-            "document_type": "",
-            "extracted_text": ""
+            "date": "",
         }
         
         try:
-            # Save the uploaded file
             with open(pdf_path, "wb") as f:
                 for chunk in pdf_file.chunks():
                     f.write(chunk)
             
-            # Extract and classify text
             extracted_text = extract_text_from_pdf(pdf_path)
-            document_type = classify_document(extracted_text)
+            date = extract_dates(extracted_text)
             
-            # Populate response
             response_data["message"] = "PDF processed successfully"
-            response_data["document_type"] = document_type
-            response_data["extracted_text"] = extracted_text
+            response_data["date"] = date
             
         except Exception as e: 
             response_data["message"] = f"Error processing PDF: {str(e)}"
         
         finally:
-            # Clean up temporary file
             try:
                 os.remove(pdf_path)
             except:
@@ -111,13 +107,12 @@ def upload_pdf(request):
 # URL patterns
 urlpatterns = [
     path("upload/", upload_pdf),
-    path("", upload_pdf),  # Add root path for easier access
+    path("upload", upload_pdf),
+    path("", upload_pdf),
 ]
 
-# Create WSGI application
 application = get_wsgi_application()
 
-# Expose as 'app' for Vercel
 app = application
 
 if __name__ == "__main__":
