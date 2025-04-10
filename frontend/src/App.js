@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import LoginPage from "./pages/Login/LoginPage";
-import AdminHome from "./pages/AdminPages/AdminHome/AdminHome";
 import StudentHome from "./pages/StudentPages/StudentHome/StudentHome";
 import FacultyHome from "./pages/FacultyPages/FacultyHome/FacultyHome";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -21,10 +20,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           
-          <Route element={<ProtectedRoute user={user} allowedRoles={["admin"]} />}>
-            <Route path="/admin/home" element={<AdminHome />} />
-          </Route>
-
           <Route element={<ProtectedRoute user={user} allowedRoles={["student"]} />}>
             <Route path="/student/home" element={<StudentHome />} />
             <Route path="/student/upload-internship-details" element={<UploadInternshipDetailsPage />} />

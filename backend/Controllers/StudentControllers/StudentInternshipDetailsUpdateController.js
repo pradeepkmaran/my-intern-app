@@ -118,7 +118,6 @@ async function uploadFile(authClient, filePath, fileName, folderID) {
 async function updateSpreadsheet(authClient, internshipData, studentRegNumber, internshipIndex) {
   const sheets = google.sheets({ version: 'v4', auth: authClient });
   
-  // First, find the row with the matching register number
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.SHEET_ID,
     range: `${process.env.SHEET_NAME}!A:AQ`,
@@ -128,7 +127,6 @@ async function updateSpreadsheet(authClient, internshipData, studentRegNumber, i
   let rowIndex = -1;
   
   for (let i = 0; i < rows.length; i++) {
-    console.log(studentRegNumber);
     if (rows[i][1] == studentRegNumber) { 
         rowIndex = i;
         break;
@@ -136,12 +134,9 @@ async function updateSpreadsheet(authClient, internshipData, studentRegNumber, i
   }
   
   if (rowIndex === -1) {
-    // If no row found, log an error - updates should only be for existing records
     throw new Error("Internship record not found in spreadsheet.");
   } else {
-    // Update existing row - determine column positions first
-    // We're assuming the basic student and internship details occupy columns A-N
-    const baseColumns = 14; // A through N for student details and basic internship info
+    const baseColumns = 14;
     
     let updates = {};
     
@@ -158,26 +153,21 @@ async function updateSpreadsheet(authClient, internshipData, studentRegNumber, i
       internshipData.location || rows[rowIndex][13] || "N/A"
     ]];
     
-    // Update the document links and verification status
-    // Each document type takes 2 columns (link + verification status)
     if (internshipData.documents) {
       DOCUMENT_TYPES.forEach((docType, index) => {
-        const colIndex = baseColumns + (index * 2); // Link column
-        const verifyColIndex = colIndex + 1; // Verification status column
+        const colIndex = baseColumns + (index * 2); 
+        const verifyColIndex = colIndex + 1; 
         
         if (internshipData.documents[docType]) {
-          // Update link column
           updates[`${process.env.SHEET_NAME}!${String.fromCharCode(65 + colIndex)}${rowIndex+1}`] = 
             [[internshipData.documents[docType].link]];
           
-          // Update verification status column
           updates[`${process.env.SHEET_NAME}!${String.fromCharCode(65 + verifyColIndex)}${rowIndex+1}`] = 
             [[internshipData.documents[docType].verified]];
         }
       });
     }
     
-    // Perform batch update for all changes
     const requests = Object.keys(updates).map(range => {
       return {
         range,
@@ -199,7 +189,6 @@ async function updateSpreadsheet(authClient, internshipData, studentRegNumber, i
 
 const StudentInternshipDetailsUpdateController = async (req, res) => {
   try {
-    // Implement the upload middleware with error handling
     upload(req, res, async function(err) {
       if (err instanceof multer.MulterError) {
         return res.status(400).json({ error: `File upload error: ${err.message}` });
@@ -208,7 +197,6 @@ const StudentInternshipDetailsUpdateController = async (req, res) => {
       }
       
       try {
-        // Get token and extract user information
         const authHeader = req.headers['authorization'];
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
           return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
@@ -224,7 +212,6 @@ const StudentInternshipDetailsUpdateController = async (req, res) => {
           userData = decoded.user;
         });
         
-        // Get user from database
         const user = await StudentUser.findOne({ email: userData.email });
         if (!user) {
           return res.status(404).json({ success: false, message: "User not found" });
@@ -235,7 +222,6 @@ const StudentInternshipDetailsUpdateController = async (req, res) => {
           throw new Error("Register number not found for this user.");
         }
         
-        // Find the internship to update
         const internshipId = req.params.internshipId;
         
         const internshipIndex = user.internships.findIndex(
@@ -246,10 +232,8 @@ const StudentInternshipDetailsUpdateController = async (req, res) => {
           return res.status(404).json({ success: false, message: "Internship not found" });
         }
         
-        // Extract existing internship data
         const existingInternship = user.internships[internshipIndex];
         
-        // Prepare updated internship data with form fields
         let updatedInternship = {
           ...existingInternship.toObject(),
           role: req.body.role || existingInternship.role,
@@ -263,7 +247,6 @@ const StudentInternshipDetailsUpdateController = async (req, res) => {
           location: req.body.location || existingInternship.location,
         };
         
-        // If documents exist in the internship, make sure we preserve them
         if (!updatedInternship.documents) {
           updatedInternship.documents = {};
         }
@@ -287,14 +270,11 @@ const StudentInternshipDetailsUpdateController = async (req, res) => {
               continue;
             }
             
-            // Create new filename with register number
-            const newFileName = `${last3Digits}-${docTypeField.replace(/[^a-zA-Z0-9]/g, '_')}-${Date.now()}${path.extname(file.originalname)}`;
+            const newFileName = `${last3Digits}-${docTypeField.replace(/[^a-zA-Z0-9]/g, '_')}-${file.originalname}`;
             const newFilePath = path.join(path.dirname(file.path), newFileName);
             
-            // Rename file
             fs.renameSync(file.path, newFilePath);
             
-            // Create a proper FormData instance for verification API
             const formData = new FormData();
             formData.append('pdf', fs.createReadStream(newFilePath));
             
@@ -307,46 +287,49 @@ const StudentInternshipDetailsUpdateController = async (req, res) => {
                 }
               });
               
-              // Parse the JSON response
               const data = response.data;
               
-              const documentType = data.document_type;
-              const extractedText = data.extracted_text;
+              const message = data.message;
+              const dates = data.dates
               
-              // Verify if the document type from API matches the expected document type
-              const isVerified = documentType === docTypeField;
+              const startDate = req.body["startDate"];
+              const endDate = req.body["endDate"];
+
+              console.log(dates);
+              console.log(startDate.toString());
+              console.log(endDate);
+
+              console.log(dates.includes(startDate.toString()));
+              console.log(dates.includes(endDate.toString()));
+              console.log(startDate < endDate);
+              
+              const isVerified = (
+                docTypeField !== "offerLetter" ||
+                (dates.includes(startDate.toString()) &&
+                dates.includes(endDate.toString()) &&
+                startDate < endDate)
+              );;
               
               documentVerification = {
-                verified: isVerified ? "Yes" : "No",
-                extractedText: extractedText
+                verified: isVerified ? "Yes" : "No"
               };
             } catch (apiError) {
               console.error("Error with document verification API:", apiError);
-              // Continue processing even if verification fails
             }
             
-            // Upload to Drive
             const driveLink = await uploadFile(authClient, newFilePath, newFileName, folderID);
             
-            // Store document info in the updated internship
-            updatedInternship.documents[docTypeField] = {
-              link: driveLink,
-              ...documentVerification
-            };
+            updatedInternship[`${docTypeField}`] = driveLink;
+            updatedInternship[`${docTypeField}Status`] = documentVerification.verified;
             
-            // Clean up local file
             fs.unlinkSync(newFilePath);
           }
         }
         
-        // Update spreadsheet data
         await updateSpreadsheet(authClient, updatedInternship, studentRegNumber);
-        
-        // Update user's internship data in database
         user.internships[internshipIndex] = updatedInternship;
         await user.save();
-        
-        // Send successful response
+
         res.status(200).json({
           success: true,
           message: "Internship details updated successfully!",

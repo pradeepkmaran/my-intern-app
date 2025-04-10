@@ -344,7 +344,6 @@ const UploadInternshipDetailsController = async (req, res) => {
         return res.status(400).json({ error: "At least one file must be uploaded." });
       }
       
-      // Validate required fields
       const requiredFields = ["role", "period", "startDate", "endDate", "companyName", "placementType", "stipend", "researchIndustry", "location"];
       for (const field of requiredFields) {
         if (!req.body[field]) {
@@ -353,7 +352,6 @@ const UploadInternshipDetailsController = async (req, res) => {
       }
       
       try {
-        // Get token and extract user information
         const authHeader = req.headers['authorization'];
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
           return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
@@ -369,7 +367,6 @@ const UploadInternshipDetailsController = async (req, res) => {
           userData = decoded.user;
         });
         
-        // Get user from database
         const user = await StudentUser.findOne({ email: userData.email });
         if (!user) {
           throw new Error("User not found in the database.");
@@ -380,65 +377,51 @@ const UploadInternshipDetailsController = async (req, res) => {
           throw new Error("Register number not found for this user.");
         }
         
-        // Get the last 4 digits of register number for file naming
         const last3Digits = studentRegNumber.slice(-3);
         
-        // Authorize with Google
         const authClient = await authorize();
         
-        // Get or create student folder in Drive
         const folderID = await getOrCreateStudentFolder(authClient, studentRegNumber);
         
-        // Process each uploaded file
         const documentInfo = {};
         
         for (const file of req.files) {
-          // Get document type from the field name in the form
           const docTypeField = req.body[`documentType_${file.originalname}`];
           
-          // Create new filename with register number
           const newFileName = `${last3Digits}-${docTypeField ? docTypeField.replace(/[^a-zA-Z0-9]/g, '_') : file.originalname}${path.extname(file.originalname)}`;
           const newFilePath = path.join(path.dirname(file.path), newFileName);
           
-          // Rename file
           fs.rename(file.path, newFilePath, (err) => {
             if (err) console.log(err);
           });
           
-          // Create a proper FormData instance
           const formData = new FormData();
           formData.append('pdf', fs.createReadStream(newFilePath));
           
-          const response = await axios.post(`${process.env.BACKEND_DJANGO_URL}/upload/`, formData, {
+          const response = await axios.post(`${process.env.BACKEND_DJANGO_URL}/upload`, formData, {
             headers: {
-              ...formData.getHeaders() // This is important for setting correct content-type with boundaries
+              ...formData.getHeaders() 
             }
           });
-          
-          // Debug the raw response
-          console.log("Response status:", response.status);
-          
-          // Parse the JSON response
+                    
           const data = response.data;
-          console.log("Response data:", data);
 
-          const documentType = data.document_type;
-          const extractedText = data.extracted_text;
           const message = data.message;
-
-          // debug
-          console.log("Orig: " + file.path);
-          console.log("New: " + newFilePath);
-          console.log("DocT: " + docTypeField);
-          console.log({ documentType, extractedText, message });
+          const dates = data.dates
           
-          // Upload to Drive
           const driveLink = await uploadFile(authClient, newFilePath, newFileName, folderID);
           
-          // Verify if the document type from API matches the expected document type
-          const isVerified = documentType === docTypeField;
+          const startDate = req.body["startDate"];
+          const endDate = req.body["endDate"];
+
+          const isVerified = (
+            docTypeField !== "offerLetter" ||
+            (dates.includes(startDate.toString()) &&
+            dates.includes(endDate.toString()) &&
+            startDate < endDate)
+          );
+
           
-          // Store document info
           if (docTypeField) {
             documentInfo[docTypeField] = {
               link: driveLink,
@@ -447,23 +430,17 @@ const UploadInternshipDetailsController = async (req, res) => {
             };
           }
           
-          // Clean up local file
           fs.unlinkSync(newFilePath);
         }
         
-        // Prepare internship details
         const internshipDetails = {
           ...req.body,
           documents: documentInfo
         };
         
-        // Update spreadsheet for this specific student's row
         await updateSpreadsheet(authClient, internshipDetails, studentRegNumber);
-        
-        // Update database
         await updateOnDB(req, internshipDetails);
         
-        // Send successful response
         res.status(200).json({
           message: "Internship details uploaded successfully!",
           data: internshipDetails,

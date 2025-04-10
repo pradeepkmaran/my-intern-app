@@ -455,18 +455,6 @@ const ViewInternshipDetails = () => {
                   <option value="Abroad">Abroad</option>
                 </select>
               </div>
-
-              <div className="filter-group">
-                <label>Work Mode</label>
-                <select
-                  value={filters.workMode}
-                  onChange={(e) => handleFilterChange("workMode", e.target.value)}
-                >
-                  <option value="">All</option>
-                  <option value="remote">Online</option>
-                  <option value="onsite">Onsite</option>
-                </select>
-              </div>
             </div>
 
             {/* Documents */}
