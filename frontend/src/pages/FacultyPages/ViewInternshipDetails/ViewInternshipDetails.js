@@ -817,11 +817,11 @@ const getCompletionStatus = (internship) => {
   if (!internship) return "incomplete";
   
   const requiredDocs = [
-    internship.permissionLetter === "true",
-    internship.completionCertificate === "true", 
-    internship.internshipReport === "true",
-    internship.studentFeedback === "true",
-    internship.employerFeedback === "true"
+    internship.permissionLetterStatus === "Yes",
+    internship.completionCertificateStatus === "Yes", 
+    internship.internshipReportStatus === "Yes",
+    internship.studentFeedbackStatus === "Yes",
+    internship.employerFeedbackStatus === "Yes"
   ];
   
   const completedCount = requiredDocs.filter(Boolean).length;
