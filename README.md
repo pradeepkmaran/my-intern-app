@@ -2,10 +2,10 @@
 
 ## Test Login
 
-### Student
+### Student Credential
 - **Email Address**: test_student@ssn.edu.in
 - **Password**: asdf
 
-### Faculty
+### Faculty Credential
 - **Email Address**: test_faculty@ssn.edu.in
 - **Password**: asdf
