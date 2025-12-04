@@ -9,3 +9,5 @@
 ### Faculty Credential
 - **Email Address**: test_faculty@ssn.edu.in
 - **Password**: asdf
+
+![Flow Diagram](flow-diagram.jpeg)
